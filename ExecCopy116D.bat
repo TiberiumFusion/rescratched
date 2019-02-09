@@ -1,0 +1,1 @@
+copy .\build\11.6D\Scratch.swf .\bin\Scratch.swf
