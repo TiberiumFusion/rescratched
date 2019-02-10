@@ -493,11 +493,18 @@ public class Scratch extends Sprite {
 		stagePane.clearCachedBitmap();
 
 		// unsupported technique that seems to force garbage collection
+		/*
+			// This is likely sourced from here: https://stackoverflow.com/questions/192373/force-garbage-collection-in-as3
+			// and has no explanation as to why it might work (if it even does)
 		try {
 			new LocalConnection().connect('foo');
 			new LocalConnection().connect('foo');
 		} catch (e:Error) {
 		}
+		*/
+		
+		// This feature is 11+ only, thus alienating the 10.2 build target. Acceptable loss: by now (2019), everything should be able to run 11.2+
+		System.pauseForGCIfCollectionImminent(0.1);
 	}
 
 	SCRATCH::allow3d
