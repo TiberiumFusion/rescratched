@@ -1,4 +1,4 @@
-# Scratch 2.0 editor and player [![Build Status](https://api.travis-ci.org/LLK/scratch-flash.svg?branch=master)](https://travis-ci.org/LLK/scratch-flash)
+# Rescratched, a continuation of the Scratch 2.0 editor and player
 
 ## Note
 
@@ -6,25 +6,9 @@
 3.0](https://scratch.mit.edu/developers). While critical issues will be addressed please note that any feature
 requests or minor issues will not be reviewed until the next major release.**
 
-## Overview
+## License
 
-This is the open source version of Scratch 2.0 and the core code for the official version found on
-<http://scratch.mit.edu>. This code has been released under the GPL version 2 license. Forks can be released under the
-GPL v2 or any later version of the GPL.
-
-If you're interested in contributing to Scratch, please take a look at the issues on this repository. Two great ways
-of helping Scratch are by identifying bugs and documenting them as issues, or fixing issues and creating pull
-requests. When submitting pull requests please be patient -- the Scratch Team is very busy and it can take a while to
-find time to review them. The organization and class structures can't be radically changed without significant
-coordination and collaboration from the Scratch Team, so these types of changes should be avoided.
-
-It's been said that the Scratch Team spends about one hour of design discussion for every pixel in Scratch, but some
-think that estimate is a little low. While we welcome suggestions for new features in our [suggestions
-forum](http://scratch.mit.edu/discuss/1/) (especially ones that come with mockups), we are unlikely to accept PRs with
-new features that we haven't deeply thought through. Why? Because we have a strong belief in the value of keeping
-things simple for new users. To learn more about our design philosophy, see [this forum
-post](http://scratch.mit.edu/discuss/post/1576/) or [this
-paper](http://web.media.mit.edu/~jmaloney/papers/ScratchLangAndEnvironment.pdf).
+Rescratched maintains the same license policy that the [Scratch 2.0 open source project](https://github.com/LLK/scratch-flash) uses. Thus, the Rescratched code is provider under the GPLv2 license, and forks can be released under GPLv2 or any later version of the GPL.
 
 ## Quick Start: Building and Debugging with Visual Studio Code
 
