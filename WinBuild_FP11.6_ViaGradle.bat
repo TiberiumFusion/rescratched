@@ -1,0 +1,1 @@
+.\gradlew build -Ptarget="11.6"
