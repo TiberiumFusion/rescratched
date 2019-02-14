@@ -43,6 +43,7 @@ public class TopBarPart extends UIPart {
 
 	protected var fileMenu:IconButton;
 	protected var editMenu:IconButton;
+	protected var advancedMenu:IconButton;
 
 	private var copyTool:IconButton;
 	private var cutTool:IconButton;
@@ -100,6 +101,7 @@ public class TopBarPart extends UIPart {
 		if (fileMenu.parent) {
 			removeChild(fileMenu);
 			removeChild(editMenu);
+			removeChild(advancedMenu);
 		}
 	}
 
@@ -149,6 +151,10 @@ public class TopBarPart extends UIPart {
 		editMenu.x = nextX;
 		editMenu.y = buttonY;
 		nextX += editMenu.width + buttonSpace;
+		
+		advancedMenu.x = nextX;
+		advancedMenu.y = buttonY;
+		nextX += advancedMenu.width + buttonSpace;
 
 		// cursor tool buttons
 		var space:int = 3;
@@ -208,6 +214,7 @@ public class TopBarPart extends UIPart {
 	protected function addTextButtons():void {
 		addChild(fileMenu = makeMenuButton('File', app.showFileMenu, true));
 		addChild(editMenu = makeMenuButton('Edit', app.showEditMenu, true));
+		addChild(advancedMenu = makeMenuButton('Advanced', app.showAdvancedMenu, true));
 	}
 
 	private function addToolButtons():void {

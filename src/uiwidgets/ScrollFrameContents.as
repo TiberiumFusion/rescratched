@@ -39,6 +39,9 @@ public class ScrollFrameContents extends Sprite {
 	// extra padding using in updateSize
 	public var hExtra:int = 10;
 	public var vExtra:int = 10;
+	
+	public var AutoHScrollPadding:Boolean = false; // If true, an extra 9 pixels (Scrollbar.cornerRadius) is added to prevent content from being obscured by the horizontal scrollbar
+	public var AutoVScrollPadding:Boolean = false; // Ditto, but for adding padding width-wise to avoid content being obscured by the vertical scrollbar
 
 	public function clear(scrollToOrigin:Boolean = true):void {
 		while (numChildren > 0) removeChildAt(0);
@@ -80,12 +83,50 @@ public class ScrollFrameContents extends Sprite {
 		}
 		maxX += hExtra;
 		maxY += vExtra;
+		var storeMaxX:int = maxX;
+		var storeMaxY:int = maxY;
+		var oldHScrollActive:Boolean = false;
+		var oldVScrollActive:Boolean = false;
+		if (parent is ScrollFrame)
+		{
+			oldHScrollActive = (parent as ScrollFrame).IsHorizontalScrollbarActive();
+			oldVScrollActive = (parent as ScrollFrame).IsVerticalScrollbarActive();
+			
+			if (oldHScrollActive && AutoHScrollPadding)
+				maxY += Scrollbar.cornerRadius;
+			if (oldVScrollActive && AutoVScrollPadding)
+				maxX += Scrollbar.cornerRadius;
+		}
 		if (parent is ScrollFrame) {
 			maxX = Math.max(maxX, ((ScrollFrame(parent).visibleW() - x) / scaleX));
 			maxY = Math.max(maxY, ((ScrollFrame(parent).visibleH() - y) / scaleY));
 		}
 		setWidthHeight(maxX, maxY);
-		if (parent is ScrollFrame) (parent as ScrollFrame).updateScrollbarVisibility();
+		if (parent is ScrollFrame)
+		{
+			(parent as ScrollFrame).updateScrollbarVisibility();
+			
+			// If this layout update went from 0 to 2 scrollbars or 1 to 2 scrollbars, and auto padding is enabled, we must re-update the layout
+			if (AutoHScrollPadding || AutoVScrollPadding)
+			{
+				if (   (parent as ScrollFrame).IsHorizontalScrollbarActive() 
+					&& (parent as ScrollFrame).IsVerticalScrollbarActive()
+					&& !(oldHScrollActive && oldVScrollActive))
+				{
+					if ((parent as ScrollFrame).IsHorizontalScrollbarActive())
+						storeMaxY += Scrollbar.cornerRadius;
+					if ((parent as ScrollFrame).IsVerticalScrollbarActive())
+						storeMaxX += Scrollbar.cornerRadius;
+						
+					storeMaxX = Math.max(storeMaxX, ((ScrollFrame(parent).visibleW() - x) / scaleX));
+					storeMaxY = Math.max(storeMaxY, ((ScrollFrame(parent).visibleH() - y) / scaleY));
+					
+					setWidthHeight(storeMaxX, storeMaxY);
+					
+					(parent as ScrollFrame).updateScrollbarVisibility();
+				}
+			}
+		}
 	}
 
 }}

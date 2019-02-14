@@ -24,6 +24,8 @@
 
 package {
 import blocks.*;
+import inappd.DebugCommandOrganizer;
+import inappd.DebugMessages;
 
 import com.adobe.utils.StringUtil;
 
@@ -73,11 +75,12 @@ import util.*;
 
 import watchers.ListWatcher;
 
-public class Scratch extends Sprite {
+public class Scratch extends Sprite
+{
 	// Version
 	public static const versionString:String = 'v461.2';
 	public static var app:Scratch; // static reference to the app, used for debugging
-
+	
 	// Display modes
 	public var hostProtocol:String = 'http';
 	public var editMode:Boolean; // true when project editor showing, false when only the player is showing
@@ -123,6 +126,7 @@ public class Scratch extends Sprite {
 	public var mediaLibrary:MediaLibrary;
 	public var lp:LoadProgress;
 	public var cameraDialog:CameraDialog;
+	public var debugConsole:DebugConsole;
 
 	// UI Parts
 	public var libraryPart:LibraryPart;
@@ -133,6 +137,11 @@ public class Scratch extends Sprite {
 	public var imagesPart:ImagesPart;
 	public var soundsPart:SoundsPart;
 	public const tipsBarClosedWidth:int = 17;
+	
+	// Rescratched DebugConsole
+	public var showDebugConsole:Boolean = false;
+	public var enableLoggingToDebugConsole:Boolean = true;
+	private function canLogToDebug():Boolean { return (enableLoggingToDebugConsole && debugConsole != null); }
 
 	public var logger:Log = new Log(16);
 
@@ -508,7 +517,8 @@ public class Scratch extends Sprite {
 	}
 
 	SCRATCH::allow3d
-	public function go3D():void {
+	public function go3D():void
+	{
 		if (!render3D || isIn3D) return;
 
 		var i:int = stagePart.getChildIndex(stagePane);
@@ -516,6 +526,9 @@ public class Scratch extends Sprite {
 		render3D.setStage(stagePane, stagePane.penLayer);
 		stagePart.addChildAt(stagePane, i);
 		isIn3D = true;
+		
+		if (canLogToDebug())
+			debugConsole.HistoryAppendMessage(DebugMessages.Tag_ScratchStage, DebugMessages.Msg_SStageWent3D);
 	}
 
 	SCRATCH::allow3d
@@ -538,6 +551,9 @@ public class Scratch extends Sprite {
 		stagePane.clearCachedBitmap();
 		stagePane.updateCostume();
 		stagePane.applyFilters();
+		
+		if (canLogToDebug())
+			debugConsole.HistoryAppendMessage(DebugMessages.Tag_ScratchStage, DebugMessages.Msg_SStageWent2D);
 	}
 
 	private var debugRect:Shape;
@@ -739,7 +755,8 @@ public class Scratch extends Sprite {
 		}
 	}
 
-	protected function step(e:Event):void {
+	protected function step(e:Event):void
+	{
 		// Step the runtime system and all UI components.
 		CachedTimer.clearCachedTimer();
 		gh.step();
@@ -749,6 +766,10 @@ public class Scratch extends Sprite {
 		libraryPart.step();
 		scriptsPart.step();
 		imagesPart.step();
+		
+		if (showDebugConsole)
+			if (debugConsole)
+				debugConsole.Step();
 	}
 
 	public function updateSpriteLibrary(sortByIndex:Boolean = false):void {
@@ -824,7 +845,8 @@ public class Scratch extends Sprite {
 		return !(autostart || editMode);
 	}
 
-	protected function addParts():void {
+	protected function addParts():void
+	{
 		initTopBarPart();
 		stagePart = getStagePart();
 		libraryPart = getLibraryPart();
@@ -836,6 +858,10 @@ public class Scratch extends Sprite {
 		addChild(stagePart);
 		addChild(libraryPart);
 		addChild(tabsPart);
+		
+		debugConsole = new DebugConsole();
+		addChild(debugConsole);
+		debugConsole.visible = showDebugConsole;
 	}
 
 	protected function getStagePart():StagePart {
@@ -918,7 +944,8 @@ public class Scratch extends Sprite {
 		stagePart.refresh();
 	}
 
-	protected function updateLayout(w:int, h:int):void {
+	protected function updateLayout(w:int, h:int):void
+	{
 		topBarPart.x = 0;
 		topBarPart.y = 0;
 		topBarPart.setWidthHeight(w, 28);
@@ -968,15 +995,25 @@ public class Scratch extends Sprite {
 		var contentY:int = tabsPart.y + 27;
 		if (!isMicroworld)
 			w -= tipsWidth();
-		updateContentArea(tabsPart.x, contentY, w - tabsPart.x - 6, h - contentY - 5, h);
+		
+		// Debug console sits below the scripts area
+		debugConsole.visible = showDebugConsole;
+		var dcHeight:int = debugConsole.visible ? debugConsole.LayoutTargetHeight + 4 : 0;
+		
+		updateContentArea(tabsPart.x, contentY, w - tabsPart.x - 6, h - contentY - 5 - dcHeight, h);
 	}
 
-	protected function updateContentArea(contentX:int, contentY:int, contentW:int, contentH:int, fullH:int):void {
+	protected function updateContentArea(contentX:int, contentY:int, contentW:int, contentH:int, fullH:int):void
+	{
 		imagesPart.x = soundsPart.x = scriptsPart.x = contentX;
 		imagesPart.y = soundsPart.y = scriptsPart.y = contentY;
 		imagesPart.setWidthHeight(contentW, contentH);
 		soundsPart.setWidthHeight(contentW, contentH);
 		scriptsPart.setWidthHeight(contentW, contentH);
+		
+		debugConsole.x = contentX;
+		debugConsole.y = contentY + contentH + 5;
+		debugConsole.PerformLayout(contentW);
 
 		if (mediaLibrary) mediaLibrary.setWidthHeight(topBarPart.w, fullH);
 
@@ -1135,6 +1172,16 @@ public class Scratch extends Sprite {
 		d.showOnStage(stage, true);
 	}
 
+	public function showAdvancedMenu(b:*):void
+	{
+		var m:Menu = new Menu(null, 'Advanced', CSS.topBarColor(), 28);
+		if (showDebugConsole)
+			m.addItem('Hide Debug Console', toggleDebugConsole);
+		else
+			m.addItem('Show Debug Console', toggleDebugConsole);
+		m.showOnStage(stage, b.x, topBarPart.bottom() - 1);
+	}
+
 	protected function canExportInternals():Boolean {
 		return false;
 	}
@@ -1279,6 +1326,12 @@ public class Scratch extends Sprite {
 		var versionDetailsBox:DialogBox = makeVersionDetailsDialog();
 		versionDetailsBox.addButton('OK', versionDetailsBox.accept);
 		versionDetailsBox.showOnStage(stage);
+	}
+
+	protected function toggleDebugConsole():void
+	{
+		showDebugConsole = !showDebugConsole;
+		fixLayout();
 	}
 
 	// -----------------------------
@@ -1526,22 +1579,26 @@ public class Scratch extends Sprite {
 		return new MediaInfo(obj, owningObj);
 	}
 
-	static public function loadSingleFile(fileLoaded:Function, filter:FileFilter = null):void {
-		function fileSelected(event:Event):void {
-			if (fileList.fileList.length > 0) {
-				var file:FileReference = FileReference(fileList.fileList[0]);
-				file.addEventListener(Event.COMPLETE, fileLoaded);
-				file.load();
+	static public function loadSingleFile(fileLoaded:Function, filter:FileFilter = null):void
+	{
+		function fileSelected(event:Event):void
+		{
+			if (fileOpen.name.length > 0)
+			{
+				fileOpen.addEventListener(Event.COMPLETE, fileLoaded);
+				fileOpen.load();
 			}
 		}
-
-		var fileList:FileReferenceList = new FileReferenceList();
-		fileList.addEventListener(Event.SELECT, fileSelected);
-		try {
+		
+		var fileOpen:FileReference = new FileReference();
+		fileOpen.addEventListener(Event.SELECT, fileSelected);
+		try
+		{
 			// Ignore the exception that happens when you call browse() with the file browser open
-			fileList.browse(filter != null ? [filter] : null);
-		} catch (e:*) {
+				// This seems acceptable
+			fileOpen.browse(filter != null ? [filter] : null);
 		}
+		catch (e:*) { }
 	}
 
 	// -----------------------------

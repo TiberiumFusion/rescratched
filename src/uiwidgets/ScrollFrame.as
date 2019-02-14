@@ -165,6 +165,15 @@ public class ScrollFrame extends Sprite implements DragClient {
 		if (hScrollbar) hScrollbar.update(-contents.x / maxScrollH(), visibleW() / contents.width);
 		if (vScrollbar) vScrollbar.update(-contents.y / maxScrollV(), visibleH() / contents.height);
 	}
+	
+	public function IsHorizontalScrollbarActive():Boolean
+	{
+		return (hScrollbar != null);
+	}
+	public function IsVerticalScrollbarActive():Boolean
+	{
+		return (vScrollbar != null);
+	}
 
 	public function updateScrollbarVisibility():void {
 		// Update scrollbar visibility when not in dragScrolling mode.
@@ -197,7 +206,24 @@ public class ScrollFrame extends Sprite implements DragClient {
 	public function maxScrollV():int {
 		return Math.max(0, contents.height - visibleH());
 	}
-
+	
+	public function ScrollToV(pos:Number):void
+	{
+		setVScroll(pos);
+		updateScrollbars();
+	}
+	public function ScrollToH(pos:Number):void
+	{
+		setHScroll(pos);
+		updateScrollbars();
+	}
+	public function ScrollToVH(posV:Number, posH:Number):void
+	{
+		setVScroll(posV);
+		setHScroll(posH);
+		updateScrollbars();
+	}
+	
 	public function canScrollLeft():Boolean {return contents.x < 0}
 	public function canScrollRight():Boolean {return contents.x > -maxScrollH()}
 	public function canScrollUp():Boolean {return contents.y < 0}

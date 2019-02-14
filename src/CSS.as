@@ -40,9 +40,13 @@ public class CSS {
 	public static const backgroundColor_default:int = white;
 	public static const topBarColor_default:int = 0x9C9EA2;
 	public static const tabColor:int = 0xE6E8E8;
+	public static const panelLighterColor:int = 0xFBFBFB;
 	public static const panelColor:int = 0xF2F2F2;
+	public static const panelDarkerColor:int = 0xDDDEDE;
 	public static const itemSelectedColor:int = 0xD0D0D0;
 	public static const borderColor:int = 0xD0D1D2;
+	public static const borderDarker1Color:int = 0xBCBDBE;
+	public static const borderDarker2Color:int = 0x7C7E81;
 	public static const textColor:int = 0x5C5D5F; // 0x6C6D6F
 	public static const buttonLabelColor:int = textColor;
 	public static const buttonLabelOverColor:int = 0xFBA939;
@@ -50,8 +54,10 @@ public class CSS {
 	public static const onColor:int = textColor; // 0x4C4D4F
 	public static const overColor:int = 0x179FD7;
 	public static const arrowColor:int = 0xA6A8AC;
+	public static const consoleTextColor:int = 0x454647;
+	public static const consoleTextDarkerColor:int = 0x2D2E2F;
 
-	// Fonts
+	// scratch-flash fonts
 	public static const font:String = Resources.chooseFont(['Arial', 'Verdana', 'DejaVu Sans']);
 	public static const menuFontSize:int = 12;
 	public static const normalTextFormat:TextFormat = new TextFormat(font, 12, textColor);
@@ -61,9 +67,14 @@ public class CSS {
 	public static const thumbnailExtraInfoFormat:TextFormat = new TextFormat(font, 9, textColor);
 	public static const projectTitleFormat:TextFormat = new TextFormat(font, 13, textColor);
 	public static const projectInfoFormat:TextFormat = new TextFormat(font, 12, textColor);
+	// Rescratched fonts
+	public static const consoleTextRegularFormat:TextFormat = new TextFormat("InconsolataRegular", 12, consoleTextColor);
+	public static const consoleTextBoldFormat:TextFormat = new TextFormat("InconsolataBold", 12, consoleTextColor);
+	public static const consoleTextDarkerRegularFormat:TextFormat = new TextFormat("InconsolataRegular", 12, consoleTextDarkerColor);
+	public static const consoleTextDarkerBoldFormat:TextFormat = new TextFormat("InconsolataBold", 12, consoleTextDarkerColor);
+	public static const consoleTextBlackRegularFormat:TextFormat = new TextFormat("InconsolataRegular", 12, 0x000000);
 
 	// Section title bars
 	public static const titleBarColors:Array = [white, tabColor];
 	public static const titleBarH:int = 30;
-
 }}
