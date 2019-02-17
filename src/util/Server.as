@@ -27,6 +27,7 @@
 
 package util {
 import by.blooddy.crypto.serialization.JSON;
+import inappd.DebugMessages;
 
 import flash.display.BitmapData;
 import flash.display.Loader;
@@ -85,6 +86,18 @@ public class Server implements IServer {
 				URLs[name] = url;
 			}
 		}
+	}
+	
+	// For debugging purposes
+	public function GetURL(propertyName:String):String
+	{
+		return URLs[propertyName];
+	}
+	public function SetURL(propertyName:String, value:String):void
+	{
+		URLs[propertyName] = value;
+		
+		Scratch.app.LogToDebugConsole(DebugMessages.Tag_ServerClient, DebugMessages.Msg_SetSvarURL(propertyName, value));
 	}
 
 	protected function getCdnStaticSiteURL():String {

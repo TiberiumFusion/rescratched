@@ -53,6 +53,9 @@ package ui
 		private var inputHint:TextField;
 		private var input:TextField;
 		
+		private var commandRecord:Vector.<String>;
+		private var commandRecordSpot:uint;
+		
 		//////////////////////////////////////////// CTOR ////////////////////////////////////////////
 		public function DebugConsole() 
 		{
@@ -60,6 +63,8 @@ package ui
 		}
 		private function init():void
 		{
+			commandRecord = new Vector.<String>();
+			
 			addChild(graphicsAssist = new Shape());
 			
 			topBrushBackground = CSS.tabColor;
@@ -127,18 +132,40 @@ package ui
 			input.addEventListener(MouseEvent.MOUSE_OUT, input_MouseOut);
 			input.addEventListener(MouseEvent.MOUSE_OVER, input_MouseOver);
 			
-			// Listener to catch enter key for input field
-			function input_EnterKey(event:KeyboardEvent):void
+			// Listener to catch special keys for input field
+			function input_OnKeyDown(event:KeyboardEvent):void
 			{
+				// Enter key
 				if (event.keyCode == 13 && input.text.length > 0)
 				{
-					PushUserCommand(StringUtil.trim(input.text));
+					var trimmed:String = StringUtil.trim(input.text);
+					commandRecord.push(trimmed);
+					commandRecordSpot = commandRecord.length;
+					PushUserCommand(trimmed);
 					input.text = "";
 					event.preventDefault();
 					event.stopImmediatePropagation();
 				}
+				// Up arrow
+				else if (event.keyCode == 38)
+				{
+					if (commandRecordSpot > 0 && commandRecord.length > 0)
+					{
+						commandRecordSpot--;
+						input.text = commandRecord[commandRecordSpot];
+					}
+				}
+				// Down arrow
+				else if (event.keyCode == 40)
+				{
+					if (commandRecordSpot < commandRecord.length - 1 && commandRecord.length > 0)
+					{
+						commandRecordSpot++;
+						input.text = commandRecord[commandRecordSpot];
+					}
+				}
 			}
-			input.addEventListener(KeyboardEvent.KEY_DOWN, input_EnterKey);
+			input.addEventListener(KeyboardEvent.KEY_DOWN, input_OnKeyDown);
 		}
 		
 		// Process whatever the user has typed and execute it if it's a valid command

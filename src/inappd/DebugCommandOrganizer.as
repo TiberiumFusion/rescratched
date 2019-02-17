@@ -16,6 +16,7 @@ package inappd
 		private static var MasterCommandList:Dictionary = new Dictionary();
 		MasterCommandList["setrender"] = function(subargs:Array):DebugCommand { return new DC_setrender(subargs); };
 		MasterCommandList["turbo"] = function(subargs:Array):DebugCommand { return new DC_turbo(subargs); };
+		MasterCommandList["svar"] = function(subargs:Array):DebugCommand { return new DC_svar(subargs); };
 		
 		
 		// Validates a command against the MasterCommandList

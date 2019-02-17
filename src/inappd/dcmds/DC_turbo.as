@@ -23,38 +23,35 @@ package inappd.dcmds
 		
 		override public function Execute(dconsole:DebugConsole = null):void
 		{
-			SCRATCH::allow3d
+			// Validate arg count
+			if (subArgs.length == 0)
+				dieNotEnoughArgs(dconsole, 1, 0);
+			else if (subArgs.length > 1)
+				dieTooManyArgs(dconsole, 1, subArgs.length);
+			else
 			{
-				// Validate arg count
-				if (subArgs.length == 0)
-					dieNotEnoughArgs(dconsole, 1, 0);
-				else if (subArgs.length > 1)
-					dieTooManyArgs(dconsole, 1, subArgs.length);
+				// Validate arg
+				var pick:String = subArgs[0];
+				if (validArgs.indexOf(pick) == -1)
+					dieBadArg(dconsole, validArgs, pick, 1);
 				else
 				{
-					// Validate arg
-					var pick:String = subArgs[0];
-					if (validArgs.indexOf(pick) == -1)
-						dieBadArg(dconsole, validArgs, pick, 1);
-					else
+					// Execute command
+					if (pick == "on")
 					{
-						// Execute command
-						if (pick == "on")
-						{
-							if (!Scratch.app.interp.turboMode)
-								Scratch.app.toggleTurboMode();
-							else
-								if (dconsole != null)
-									dconsole.HistoryAppendMessage(DebugMessages.Tag_NeutralNoChange, DebugMessages.Msg_TurboAlreadyOn);
-						}
-						else if (pick == "off")
-						{
-							if (Scratch.app.interp.turboMode)
-								Scratch.app.toggleTurboMode();
-							else
-								if (dconsole != null)
-									dconsole.HistoryAppendMessage(DebugMessages.Tag_NeutralNoChange, DebugMessages.Msg_TurboAlreadyOff);
-						}
+						if (!Scratch.app.interp.turboMode)
+							Scratch.app.toggleTurboMode();
+						else
+							if (dconsole != null)
+								dconsole.HistoryAppendMessage(DebugMessages.Tag_NeutralNoChange, DebugMessages.Msg_TurboAlreadyOn);
+					}
+					else if (pick == "off")
+					{
+						if (Scratch.app.interp.turboMode)
+							Scratch.app.toggleTurboMode();
+						else
+							if (dconsole != null)
+								dconsole.HistoryAppendMessage(DebugMessages.Tag_NeutralNoChange, DebugMessages.Msg_TurboAlreadyOff);
 					}
 				}
 			}

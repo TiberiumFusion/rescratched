@@ -26,6 +26,8 @@ package {
 import blocks.*;
 import inappd.DebugCommandOrganizer;
 import inappd.DebugMessages;
+import inappd.FormattedString;
+import inappd.FormattedStringList;
 
 import com.adobe.utils.StringUtil;
 
@@ -219,7 +221,7 @@ public class Scratch extends Sprite
 		stage.addEventListener(Event.ENTER_FRAME, step);
 		stage.addEventListener(Event.RESIZE, onResize);
 
-		setEditMode(startInEditMode());
+		setEditMode(startInEditMode() || true);
 
 		// install project before calling fixLayout()
 		if (editMode) runtime.installNewProject();
@@ -259,6 +261,13 @@ public class Scratch extends Sprite
 				if (!success) jsThrowError('Calling JSeditorReady() failed.');
 			});
 		}
+	}
+	
+	// Receiver method for debug logging from any class
+	public function LogToDebugConsole(messageTag:FormattedString, messageBody:FormattedStringList):void
+	{
+		if (canLogToDebug())
+			debugConsole.HistoryAppendMessage(messageTag, messageBody);
 	}
 
 	private function loadSingleGithubURL(url:String):void {
@@ -527,8 +536,7 @@ public class Scratch extends Sprite
 		stagePart.addChildAt(stagePane, i);
 		isIn3D = true;
 		
-		if (canLogToDebug())
-			debugConsole.HistoryAppendMessage(DebugMessages.Tag_ScratchStage, DebugMessages.Msg_SStageWent3D);
+		LogToDebugConsole(DebugMessages.Tag_ScratchStage, DebugMessages.Msg_SStageWent3D);
 	}
 
 	SCRATCH::allow3d
@@ -552,8 +560,7 @@ public class Scratch extends Sprite
 		stagePane.updateCostume();
 		stagePane.applyFilters();
 		
-		if (canLogToDebug())
-			debugConsole.HistoryAppendMessage(DebugMessages.Tag_ScratchStage, DebugMessages.Msg_SStageWent2D);
+		LogToDebugConsole(DebugMessages.Tag_ScratchStage, DebugMessages.Msg_SStageWent2D);
 	}
 
 	private var debugRect:Shape;
@@ -767,9 +774,8 @@ public class Scratch extends Sprite
 		scriptsPart.step();
 		imagesPart.step();
 		
-		if (showDebugConsole)
-			if (debugConsole)
-				debugConsole.Step();
+		if (showDebugConsole && debugConsole != null)
+			debugConsole.Step();
 	}
 
 	public function updateSpriteLibrary(sortByIndex:Boolean = false):void {
@@ -861,7 +867,6 @@ public class Scratch extends Sprite
 		
 		debugConsole = new DebugConsole();
 		addChild(debugConsole);
-		debugConsole.visible = showDebugConsole;
 	}
 
 	protected function getStagePart():StagePart {
@@ -997,8 +1002,7 @@ public class Scratch extends Sprite
 			w -= tipsWidth();
 		
 		// Debug console sits below the scripts area
-		debugConsole.visible = showDebugConsole;
-		var dcHeight:int = debugConsole.visible ? debugConsole.LayoutTargetHeight + 4 : 0;
+		var dcHeight:int = showDebugConsole ? debugConsole.LayoutTargetHeight + 4 : 0;
 		
 		updateContentArea(tabsPart.x, contentY, w - tabsPart.x - 6, h - contentY - 5 - dcHeight, h);
 	}
@@ -1301,6 +1305,11 @@ public class Scratch extends Sprite
 	public function toggleTurboMode():void {
 		interp.turboMode = !interp.turboMode;
 		stagePart.refresh();
+		
+		if (interp.turboMode)
+			LogToDebugConsole(DebugMessages.Tag_ScratchStage, DebugMessages.Msg_TurboSetOn);
+		else
+			LogToDebugConsole(DebugMessages.Tag_ScratchStage, DebugMessages.Msg_TurboSetOff);
 	}
 
 	public function handleTool(tool:String, evt:MouseEvent):void {
@@ -1330,6 +1339,10 @@ public class Scratch extends Sprite
 
 	protected function toggleDebugConsole():void
 	{
+		if (showDebugConsole)
+			removeChild(debugConsole);
+		else
+			addChild(debugConsole);
 		showDebugConsole = !showDebugConsole;
 		fixLayout();
 	}

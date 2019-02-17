@@ -30,6 +30,12 @@ package inappd
 				dconsole.HistoryAppendMessage(DebugMessages.Tag_BadUserInput, DebugMessages.Msg_NotEnoughArgs(expected, got));
 			throw new DCError("Not enough arguments");
 		}
+		protected function dieNotEnoughAtLeastArgs(dconsole:DebugConsole, expected:int, got:int):void
+		{
+			if (dconsole != null)
+				dconsole.HistoryAppendMessage(DebugMessages.Tag_BadUserInput, DebugMessages.Msg_NotEnoughAtLeastArgs(expected, got));
+			throw new DCError("Not enough at least arguments");
+		}
 		protected function dieTooManyArgs(dconsole:DebugConsole, expected:int, got:int):void
 		{
 			if (dconsole != null)

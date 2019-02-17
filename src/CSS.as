@@ -55,7 +55,7 @@ public class CSS {
 	public static const overColor:int = 0x179FD7;
 	public static const arrowColor:int = 0xA6A8AC;
 	public static const consoleTextColor:int = 0x454647;
-	public static const consoleTextDarkerColor:int = 0x2D2E2F;
+	public static const consoleTextDarkerColor:int = 0x272829;
 
 	// scratch-flash fonts
 	public static const font:String = Resources.chooseFont(['Arial', 'Verdana', 'DejaVu Sans']);
