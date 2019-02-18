@@ -1,38 +1,8 @@
 # Rescratched, a continuation of the Scratch 2.0 editor and player
 
-## Note
-
-**Scratch 2.0 is now in maintenance mode while the team focuses efforts on [Scratch
-3.0](https://scratch.mit.edu/developers). While critical issues will be addressed please note that any feature
-requests or minor issues will not be reviewed until the next major release.**
-
 ## License
 
 Rescratched maintains the same license policy that the [Scratch 2.0 open source project](https://github.com/LLK/scratch-flash) uses. Thus, the Rescratched code is provider under the GPLv2 license, and forks can be released under GPLv2 or any later version of the GPL.
-
-## Quick Start: Building and Debugging with Visual Studio Code
-
-1. Build at least once using the Gradle instructions listed in the "Building" instructions below.
-   * TL;DR: run `./gradlew build -Ptarget="11.6"` in a terminal (on Windows, replace `/` with `\` as usual).
-   * This will download and unpack the necessary SDKs.
-   * You may need to agree to a few licenses (press `y` then `enter`).
-   * It may take quite a while and appear to hang at times. Watch disk and network activity to be sure.
-2. Install [Visual Studio Code](https://code.visualstudio.com/).
-3. Install the "ActionScript & MXML" extension (search for `@ext:as3` in the `Extensions` pane).
-   * Reload VS Code when prompted.
-4. Add the `scratch-flash` folder to the VS Code workspace.
-5. Click "No SDK" then "Add more SDKs to this list...".
-6. Browse to your home directory, then go into `.gradle`, then `gradleFx`. Choose `sdks` and close the dialog.
-7. Your list of SDKs should now include something starting with "Apache Flex 4.15.0"; choose that.
-
-You should now be able to build and debug using your usual Visual Studio Code hotkeys. The defaults are Ctrl+Shift+B
-(or Cmd+Shift+B on Mac) to build and F5 to run.
-
-Note that this will build a SWF which requires a very recent version of Flash, so the IDE build should only be used
-for development and debugging. The Gradle builds (see below) are configured for compatibility with a broad range of
-Flash versions.
-
-Check `asconfig.json` for the configuration settings used by the IDE build.
 
 ## Building
 
