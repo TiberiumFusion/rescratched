@@ -17,6 +17,7 @@ package inappd
 		MasterCommandList["setrender"] = function(subargs:Array):DebugCommand { return new DC_setrender(subargs); };
 		MasterCommandList["turbo"] = function(subargs:Array):DebugCommand { return new DC_turbo(subargs); };
 		MasterCommandList["svar"] = function(subargs:Array):DebugCommand { return new DC_svar(subargs); };
+		MasterCommandList["pget"] = function(subargs:Array):DebugCommand { return new DC_pget(subargs); };
 		
 		
 		// Validates a command against the MasterCommandList

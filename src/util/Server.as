@@ -103,6 +103,17 @@ public class Server implements IServer {
 	protected function getCdnStaticSiteURL():String {
 		return URLs.siteCdnPrefix + URLs.staticFiles;
 	}
+	
+	// Links to either an entire SB project or an SB2 project JSON
+	public function GetProjectBytesUrl(projectID:String):String
+	{
+		return URLs["projectPrefix"] + URLs["internalAPI"] + "project/" + projectID + "/get/";
+	}
+	// Links to a project asset
+	public function GetAssetUrl(assetMD5:String):String
+	{
+		return URLs["assetCdnPrefix"] + URLs["internalAPI"] + "asset/" + assetMD5 + '/get/'
+	}
 
 	// Returns a URL for downloading the JS for an official extension given input like 'myExtension.js'
 	public function getOfficialExtensionURL(extensionName:String):String {

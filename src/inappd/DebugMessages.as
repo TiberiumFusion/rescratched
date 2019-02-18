@@ -17,7 +17,9 @@ package inappd
 		public static const Tag_InvalidUserCmd:FormattedString = new FormattedString("---- x", new TextFormat("InconsolataRegular", 12, 0xB32222));
 		public static const Tag_BadUserInput:FormattedString = new FormattedString("xxxx x", new TextFormat("InconsolataRegular", 12, 0xE2760A));
 		public static const Tag_ScratchStage:FormattedString = new FormattedString("[SSTG]", new TextFormat("InconsolataBold", 12, 0x257317));
-		public static const Tag_ServerClient:FormattedString = new FormattedString("[SVCL]", new TextFormat("InconsolataBold", 12, 0xB55F11));
+		public static const Tag_ServerClient:FormattedString = new FormattedString("[SVCL]", new TextFormat("InconsolataBold", 12, 0x1E9FBB));
+		public static const Tag_RescratchedLoader:FormattedString = new FormattedString("[RSLD]", new TextFormat("InconsolataBold", 12, 0x2062AA));
+		public static const Tag_ScratchRuntime:FormattedString = new FormattedString("[SRUN]", new TextFormat("InconsolataBold", 12, 0xB76A1E));
 		
 		
 		//////////////////////////////////////////// Debug Messages ////////////////////////////////////////////
@@ -31,6 +33,19 @@ package inappd
 		public static const Msg_TurboAlreadyOn:FormattedStringList = new FormattedStringList(new FormattedString("Turbo mode is already enabled", CSS.consoleTextRegularFormat));
 		public static const Msg_TurboSetOff:FormattedStringList = new FormattedStringList(new FormattedString("Turbo mode disabled", CSS.consoleTextRegularFormat));
 		public static const Msg_TurboAlreadyOff:FormattedStringList = new FormattedStringList(new FormattedString("Turbo mode is already disabled", CSS.consoleTextRegularFormat));
+		public static const Msg_ProjectBytesAreSB:FormattedStringList = new FormattedStringList(new FormattedString("Retrieved bytes are an SB file", CSS.consoleTextRegularFormat));
+		public static const Msg_ProjectBytesAreSB2:FormattedStringList = new FormattedStringList(new FormattedString("Retrieved bytes are an SB2 file", CSS.consoleTextRegularFormat));
+		public static const Msg_ProjectBytesAreSB2JSON:FormattedStringList = new FormattedStringList(new FormattedString("Retrieved bytes are Scratch 2.0 JSON", CSS.consoleTextRegularFormat));
+		public static const Msg_ProjectBytesAreSB3JSON:FormattedStringList = new FormattedStringList(new FormattedString("Retrieved bytes are Scratch 3.0 JSON", CSS.consoleTextRegularFormat));
+		public static const Msg_InstallingSBProject:FormattedStringList = new FormattedStringList(new FormattedString("Installing SB project", CSS.consoleTextRegularFormat));
+		public static const Msg_InstallingSB2Project:FormattedStringList = new FormattedStringList(new FormattedString("Installing SB2 project", CSS.consoleTextRegularFormat));
+		public static const Msg_ProjectGenericInstallFail:FormattedStringList = new FormattedStringList(new FormattedString("Project failed to install", CSS.consoleTextRegularFormat));
+		public static const Msg_RescratchedLoaderConflict:FormattedStringList = new FormattedStringList(new FormattedString("Rescratched is already in the process of retrieving a project from the Scratch servers. You must wait for this to finish before retrieving another one.", CSS.consoleTextRegularFormat));
+		public static const Msg_LoadSMEProjectMissingData:FormattedStringList = new FormattedStringList(new FormattedString("RSLoader does not have sufficient data to continue loading this project", CSS.consoleTextRegularFormat));
+		public static const Msg_LoadSMEProjectInstalling:FormattedStringList = new FormattedStringList(new FormattedString("Installing assets and project", CSS.consoleTextRegularFormat));
+		public static const Msg_LoadSMEProjectAborted:FormattedStringList = new FormattedStringList(new FormattedString("Project load aborted", CSS.consoleTextRegularFormat));
+		public static const Msg_LoadSMEProjectFinished:FormattedStringList = new FormattedStringList(new FormattedString("Project load finished", CSS.consoleTextRegularFormat));
+		public static const Msg_RuntimeInstalledProject:FormattedStringList = new FormattedStringList(new FormattedString("Projection installation complete", CSS.consoleTextRegularFormat));
 		
 		///// General message generators
 		// DebugCommand input
@@ -82,6 +97,72 @@ package inappd
 			message.AddText(new FormattedString(name, CSS.consoleTextBoldFormat));
 			message.AddText(new FormattedString(" has been set to ", CSS.consoleTextRegularFormat));
 			message.AddText(new FormattedString(value, CSS.consoleTextBoldFormat));
+			return message;
+		}
+		// RescratchedIO project loading
+		public static function Msg_LoadSMEProjectBadID(badID:String):FormattedStringList
+		{
+			var message:FormattedStringList = new FormattedStringList();
+			message.AddText(new FormattedString("The specified project ID ", CSS.consoleTextRegularFormat));
+			message.AddText(new FormattedString(badID, CSS.consoleTextBoldFormat));
+			message.AddText(new FormattedString(" could not be parsed", CSS.consoleTextRegularFormat));
+			return message;
+		}
+		public static function Msg_LoadSMEProjectNoJS():FormattedStringList
+		{
+			var message:FormattedStringList = new FormattedStringList();
+			message.AddText(new FormattedString("Cannot retrieve project, JS interface is unavailable", CSS.consoleTextRegularFormat));
+			return message;
+		}
+		public static function Msg_LoadSMEProjectGetProject():FormattedStringList
+		{
+			var message:FormattedStringList = new FormattedStringList();
+			message.AddText(new FormattedString("Requesting download of project data", CSS.consoleTextRegularFormat));
+			return message;
+		}
+		public static function Msg_LoadSMEProjectHTMLError(errorCode:String, extra:String = null):FormattedStringList
+		{
+			var message:FormattedStringList = new FormattedStringList();
+			message.AddText(new FormattedString("Get project failed, HTTP request error ", CSS.consoleTextRegularFormat));
+			message.AddText(new FormattedString(errorCode, CSS.consoleTextBoldFormat));
+			if (extra != null)
+				message.AddText(new FormattedString(extra, CSS.consoleTextRegularFormat));
+			return message;
+		}
+		public static function Msg_LoadSMEProjectGotNull():FormattedStringList
+		{
+			var message:FormattedStringList = new FormattedStringList();
+			message.AddText(new FormattedString("Get project failed, no data was retrieved", CSS.consoleTextRegularFormat));
+			return message;
+		}
+		public static function Msg_LoadSMEProjectZeroLength():FormattedStringList
+		{
+			var message:FormattedStringList = new FormattedStringList();
+			message.AddText(new FormattedString("Get project failed, received 0 bytes", CSS.consoleTextRegularFormat));
+			return message;
+		}
+		public static function Msg_LoadSMEProjectNotEnoughBytes(length:int):FormattedStringList
+		{
+			var message:FormattedStringList = new FormattedStringList();
+			message.AddText(new FormattedString("Get project failed, only received " + length + " bytes", CSS.consoleTextRegularFormat));
+			return message;
+		}
+		public static function Msg_LoadSMEProjectProbablySuccessful(length:int):FormattedStringList
+		{
+			var message:FormattedStringList = new FormattedStringList();
+			message.AddText(new FormattedString("Project download probably succeeded (?), received " + length + " bytes", CSS.consoleTextRegularFormat));
+			return message;
+		}
+		public static function Msg_LoadSMEProjectGetAssets():FormattedStringList
+		{
+			var message:FormattedStringList = new FormattedStringList();
+			message.AddText(new FormattedString("Requesting downloads of project assets", CSS.consoleTextRegularFormat));
+			return message;
+		}
+		public static function Msg_LoadSMEProjectAssetMismatch(actual:int, expected:int):FormattedStringList
+		{
+			var message:FormattedStringList = new FormattedStringList();
+			message.AddText(new FormattedString("Received mismatched number project assets. Got " + actual + ", expected " + expected, CSS.consoleTextRegularFormat));
 			return message;
 		}
 	}

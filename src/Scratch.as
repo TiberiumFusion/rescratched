@@ -144,10 +144,15 @@ public class Scratch extends Sprite
 	public var showDebugConsole:Boolean = false;
 	public var enableLoggingToDebugConsole:Boolean = true;
 	private function canLogToDebug():Boolean { return (enableLoggingToDebugConsole && debugConsole != null); }
+	
+	// Loading from SME with RescratchedLoader
+	public var RSLoader:RescratchedLoader;
 
+	
 	public var logger:Log = new Log(16);
 
-	public function Scratch() {
+	public function Scratch()
+	{
 		SVGTool.setStage(stage);
 		loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, uncaughtErrorHandler);
 		app = this;
@@ -240,7 +245,8 @@ public class Scratch extends Sprite
 		jsEditorReady();
 	}
 
-	protected function setupExternalInterface(oldWebsitePlayer:Boolean):void {
+	protected function setupExternalInterface(oldWebsitePlayer:Boolean):void
+	{
 		if (!jsEnabled) return;
 
 		addExternalCallback('ASloadExtension', extensionManager.loadRawExtension);
@@ -253,6 +259,12 @@ public class Scratch extends Sprite
 			addExternalCallback('ASloadBase64SBX', loadBase64SBX);
 			addExternalCallback('ASsetModalOverlay', setModalOverlay);
 		}
+		
+		// Rescratched
+		addExternalCallback("ASloadProjectBytesBase64", loadFromSMEProjectLoaded);
+		addExternalCallback("ASloadProjectHTMLError", loadFromSMEProjectHTMLError);
+		addExternalCallback("ASloadAssetsBytesBase64", loadFromSMEAssetsLoaded);
+		//addExternalCallback("ASloadAssetsHTMLError", RescratchedIO.AssetsLoadHTMLError);
 	}
 
 	protected function jsEditorReady():void {
@@ -270,6 +282,9 @@ public class Scratch extends Sprite
 			debugConsole.HistoryAppendMessage(messageTag, messageBody);
 	}
 
+	
+	//////////////////////////////////////////// Remote SBX Load (ScratchX github) ////////////////////////////////////////////
+	
 	private function loadSingleGithubURL(url:String):void {
 		url = StringUtil.trim(unescape(url));
 
@@ -358,7 +373,45 @@ public class Scratch extends Sprite
 		app.setProjectName('');
 		runtime.installProjectFromData(sbxData);
 	}
-
+	
+	
+	//////////////////////////////////////////// SME Project Load ////////////////////////////////////////////
+	
+	// Starting method of the whole process
+	public function LoadProjectFromSME(projectID:String):void
+	{
+		if (RSLoader != null)
+		{
+			if (RSLoader.InProgress)
+			{
+				Scratch.app.LogToDebugConsole(DebugMessages.Tag_RescratchedLoader, DebugMessages.Msg_RescratchedLoaderConflict);
+				return;
+			}
+		}
+		
+		runtime.stopAll();
+		RSLoader = new RescratchedLoader(this);
+		RSLoader.BeginLoadSMEProject(projectID);
+	}
+	// Callback when the project bytes requested by the RescratchedLoader have been retrieved
+	public function loadFromSMEProjectLoaded(projectEncoded:String):void
+	{
+		RSLoader.ParseProjectBytesBase64(projectEncoded);
+	}
+	// If the retrieval fails, it'll most likely be a 404 or 403 due to the user-specified ID being a Scratch 3.0 project
+	public function loadFromSMEProjectHTMLError(errorCode:String):void
+	{
+		RSLoader.ProjectLoadHTMLError(errorCode);
+	}
+	// Callback when the project's assets requested by the RescratchedLoader have been retrieved
+	public function loadFromSMEAssetsLoaded(assetsEncoded:String):void
+	{
+		RSLoader.ParseAssetsBytesBase64(assetsEncoded);
+	}
+	
+	
+	//////////////////////////////////////////// UI PARTS ////////////////////////////////////////////
+	
 	protected function initTopBarPart():void {
 		topBarPart = new TopBarPart(this);
 	}

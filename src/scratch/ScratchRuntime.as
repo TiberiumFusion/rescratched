@@ -22,6 +22,7 @@
 
 package scratch {
 import assets.Resources;
+import inappd.DebugMessages;
 
 import blocks.Block;
 import blocks.BlockArg;
@@ -100,11 +101,12 @@ public class ScratchRuntime {
 	//------------------------------
 
 	public function stepRuntime():void {
-		if (projectToInstall != null && (app.isOffline || app.isExtensionDevMode)) {
+		if (projectToInstall != null && (app.isOffline || app.isExtensionDevMode || true)) {
 			installProject(projectToInstall);
 			if (saveAfterInstall) app.setSaveNeeded(true);
 			projectToInstall = null;
 			saveAfterInstall = false;
+			Scratch.app.LogToDebugConsole(DebugMessages.Tag_ScratchRuntime, DebugMessages.Msg_RuntimeInstalledProject);
 			return;
 		}
 		if (ready==ReadyLabel.COUNTDOWN) {
@@ -802,7 +804,8 @@ public class ScratchRuntime {
 		Scratch.loadSingleFile(fileLoadHandler, filter);
 	}
 
-	public function installProjectFromFile(fileName:String, data:ByteArray):void {
+	public function installProjectFromFile(fileName:String, data:ByteArray):void
+	{
 		// Install a project from a file with the given name and contents.
 		stopAll();
 		app.oldWebsiteURL = '';
@@ -810,19 +813,37 @@ public class ScratchRuntime {
 		installProjectFromData(data);
 		app.setProjectName(fileName);
 	}
+	
+	// Installs a project from a byte array
+	public function installProjectFromBytes(projectBytes:ByteArray, projectName:String = ""):void
+	{
+		stopAll();
+		app.oldWebsiteURL = '';
+		app.loadInProgress = true;
+		installProjectFromData(projectBytes);
+		app.setProjectName(projectName);
+	}
 
-	public function installProjectFromData(data:ByteArray, saveForRevert:Boolean = true):void {
+	public function installProjectFromData(data:ByteArray, saveForRevert:Boolean = true):void
+	{
 		var newProject:ScratchStage;
 		stopAll();
 		data.position = 0;
-		if (data.length < 8 || data.readUTFBytes(8) != 'ScratchV') {
+		if (data.length < 8 || data.readUTFBytes(8) != 'ScratchV') // Scratchr2 project
+		{
+			Scratch.app.LogToDebugConsole(DebugMessages.Tag_ScratchRuntime, DebugMessages.Msg_InstallingSB2Project);
+			
 			data.position = 0;
 			newProject = new ProjectIO(app).decodeProjectFromZipFile(data);
 			if (!newProject) {
 				projectLoadFailed();
 				return;
 			}
-		} else {
+		}
+		else // Scratch 1.4 project
+		{
+			Scratch.app.LogToDebugConsole(DebugMessages.Tag_ScratchRuntime, DebugMessages.Msg_InstallingSBProject);
+			
 			var info:Object;
 			var objTable:Array;
 			data.position = 0;
@@ -842,7 +863,9 @@ public class ScratchRuntime {
 		decodeImagesAndInstall(newProject);
 	}
 
-	public function projectLoadFailed(ignore:* = null):void {
+	public function projectLoadFailed(ignore:* = null):void
+	{
+		Scratch.app.LogToDebugConsole(DebugMessages.Tag_ScratchRuntime, DebugMessages.Msg_ProjectGenericInstallFail);
 		app.removeLoadProgressBox();
 		//DialogBox.notify('Error!', 'Project did not load.', app.stage);
 		app.loadProjectFailed();
