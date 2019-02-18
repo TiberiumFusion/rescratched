@@ -28,7 +28,15 @@ package inappd.dcmds
 				dieTooManyArgs(dconsole, 1, subArgs.length);
 			else
 			{
-				Scratch.app.LoadProjectFromSME(subArgs[0]);
+				if (subArgs[0] == "forceabort")
+				{
+					if (Scratch.app.RSLoader != null && Scratch.app.RSLoader.InProgress)
+						Scratch.app.RSLoader.AbortLoad();
+				}
+				else
+				{
+					Scratch.app.LoadProjectFromSME(subArgs[0]);
+				}
 			}
 		}
 	}

@@ -59,6 +59,7 @@ package util
 			if (pIDClean == null)
 			{
 				Scratch.app.LogToDebugConsole(DebugMessages.Tag_RescratchedLoader, DebugMessages.Msg_LoadSMEProjectBadID(projectID));
+				AbortLoad();
 				return;
 			}
 			
@@ -67,14 +68,18 @@ package util
 			// Hand off to JS for now, which will return to us with the project data (hopefully)
 			if (Scratch.app.jsEnabled)
 			{
-				Scratch.app.LogToDebugConsole(DebugMessages.Tag_RescratchedLoader, DebugMessages.Msg_LoadSMEProjectGetProject());
+				Scratch.app.LogToDebugConsole(DebugMessages.Tag_RescratchedLoader, DebugMessages.Msg_LoadSMEProjectGetProject(pIDClean));
 				// Must use JS to get the project data from SME
 				Scratch.app.externalCall("JSSMELoadProjectBytes", null, getURL);
 				
-				// Execution will resume in the ParseProjectBytesBase64() method
+				// Execution will resume in the ParseProjectBytesBase64() or ProjectLoadHTMLError() method
 			}
 			else
-				Scratch.app.LogToDebugConsole(DebugMessages.Tag_RescratchedLoader, DebugMessages.Msg_LoadSMEProjectNoJS());
+			{
+				Scratch.app.LogToDebugConsole(DebugMessages.Tag_RescratchedLoader, DebugMessages.Msg_LoadSMEProjectNoJS);
+				AbortLoad();
+				return;
+			}
 		}
 		
 		///// JS return calls this to send us the retrieved project bytes
@@ -85,14 +90,14 @@ package util
 			
 			if (encoded == null)
 			{
-				Scratch.app.LogToDebugConsole(DebugMessages.Tag_RescratchedLoader, DebugMessages.Msg_LoadSMEProjectGotNull());
+				Scratch.app.LogToDebugConsole(DebugMessages.Tag_RescratchedLoader, DebugMessages.Msg_LoadSMEProjectGotNull);
 				FinishLoad();
 				return;
 			}
 			projectBytes = Base64Encoder.decode(encoded);
 			if (projectBytes.length == 0)
 			{
-				Scratch.app.LogToDebugConsole(DebugMessages.Tag_RescratchedLoader, DebugMessages.Msg_LoadSMEProjectZeroLength());
+				Scratch.app.LogToDebugConsole(DebugMessages.Tag_RescratchedLoader, DebugMessages.Msg_LoadSMEProjectZeroLength);
 				FinishLoad();
 				return;
 			}
@@ -181,7 +186,7 @@ package util
 					urlsString += '|';
 			}
 			
-			Scratch.app.LogToDebugConsole(DebugMessages.Tag_RescratchedLoader, DebugMessages.Msg_LoadSMEProjectGetAssets());
+			Scratch.app.LogToDebugConsole(DebugMessages.Tag_RescratchedLoader, DebugMessages.Msg_LoadSMEProjectGetAssets);
 			Scratch.app.externalCall("JSSMELoadAllAssets", null, urlsString);
 		}
 		
@@ -215,7 +220,6 @@ package util
 			}
 			
 			// Complete the project install
-			Scratch.app.LogToDebugConsole(DebugMessages.Tag_RescratchedLoader, DebugMessages.Msg_LoadSMEProjectInstalling);
 			installAssets(projectStage.allObjects(), projectAssetsMap);
 			app.runtime.decodeImagesAndInstall(projectStage);
 			

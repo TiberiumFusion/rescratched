@@ -100,13 +100,14 @@ public class ScratchRuntime {
 	// Running and stopping
 	//------------------------------
 
-	public function stepRuntime():void {
-		if (projectToInstall != null && (app.isOffline || app.isExtensionDevMode || true)) {
+	public function stepRuntime():void
+	{
+		if (projectToInstall != null && (app.isOffline || app.isExtensionDevMode || true))
+		{
 			installProject(projectToInstall);
 			if (saveAfterInstall) app.setSaveNeeded(true);
 			projectToInstall = null;
 			saveAfterInstall = false;
-			Scratch.app.LogToDebugConsole(DebugMessages.Tag_ScratchRuntime, DebugMessages.Msg_RuntimeInstalledProject);
 			return;
 		}
 		if (ready==ReadyLabel.COUNTDOWN) {
@@ -769,13 +770,17 @@ public class ScratchRuntime {
 	// Project Loading and Installing
 	//------------------------------
 
-	public function installEmptyProject():void {
+	public function installEmptyProject():void
+	{
+		Scratch.app.LogToDebugConsole(DebugMessages.Tag_ScratchRuntime, DebugMessages.Msg_RuntimeInstallingEmptyProject);
+		
 		app.saveForRevert(null, true);
 		app.oldWebsiteURL = '';
 		installProject(new ScratchStage());
 	}
 
-	public function installNewProject():void {
+	public function installNewProject():void
+	{
 		installEmptyProject();
 	}
 
@@ -876,7 +881,10 @@ public class ScratchRuntime {
 		new ProjectIO(app).decodeAllImages(newProject.allObjects(), imagesDecoded);
 	}
 
-	protected function installProject(project:ScratchStage):void {
+	protected function installProject(project:ScratchStage):void
+	{
+		Scratch.app.LogToDebugConsole(DebugMessages.Tag_ScratchRuntime, DebugMessages.Msg_RuntimeInstallingProject);
+		
 		if (app.stagePane != null) stopAll();
 		if (app.scriptsPane) app.scriptsPane.viewScriptsFor(null);
 
@@ -906,6 +914,8 @@ public class ScratchRuntime {
 		app.extensionManager.step();
 		app.projectLoaded();
 		SCRATCH::allow3d { checkForGraphicEffects(); }
+		
+		Scratch.app.LogToDebugConsole(DebugMessages.Tag_ScratchRuntime, DebugMessages.Msg_RuntimeInstalledProject);
 	}
 
 	SCRATCH::allow3d
