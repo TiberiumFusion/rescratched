@@ -589,6 +589,8 @@ public class Scratch extends Sprite
 		stagePart.addChildAt(stagePane, i);
 		isIn3D = true;
 		
+		stagePart.UpdateRenderModeIndicator();
+		
 		LogToDebugConsole(DebugMessages.Tag_ScratchStage, DebugMessages.Msg_SStageWent3D);
 	}
 
@@ -612,6 +614,8 @@ public class Scratch extends Sprite
 		stagePane.clearCachedBitmap();
 		stagePane.updateCostume();
 		stagePane.applyFilters();
+		
+		stagePart.UpdateRenderModeIndicator();
 		
 		LogToDebugConsole(DebugMessages.Tag_ScratchStage, DebugMessages.Msg_SStageWent2D);
 	}
@@ -715,34 +719,40 @@ public class Scratch extends Sprite
 
 	protected var wasEditing:Boolean;
 
-	public function setPresentationMode(enterPresentation:Boolean):void {
-		if (stagePart.isInPresentationMode() != enterPresentation) {
+	public function setPresentationMode(enterPresentation:Boolean):void
+	{
+		if (stagePart.isInPresentationMode() != enterPresentation)
 			presentationModeWasChanged(enterPresentation);
-		}
 	}
 
-	public function presentationModeWasChanged(enterPresentation:Boolean):void {
-		if (enterPresentation) {
+	public function presentationModeWasChanged(enterPresentation:Boolean):void
+	{
+		if (enterPresentation)
+		{
+			debugConsole.visible = false; // Might change later to be more performant
+			
 			wasEditing = editMode;
-			if (wasEditing) {
+			if (wasEditing)
 				setEditMode(false);
-				if (jsEnabled) externalCall('tip_bar_api.hide');
-			}
-		} else {
-			if (wasEditing) {
+		}
+		else
+		{
+			debugConsole.visible = true;
+			
+			if (wasEditing)
 				setEditMode(true);
-				if (jsEnabled) externalCall('tip_bar_api.show');
-			}
 		}
-		if (isOffline) {
+		
+		if (isOffline)
 			stage.displayState = enterPresentation ? StageDisplayState.FULL_SCREEN_INTERACTIVE : StageDisplayState.NORMAL;
-		}
+			
 		for each (var o:ScratchObj in stagePane.allObjects()) o.applyFilters();
 
 		if (lp) fixLoadProgressLayout();
 		stagePart.presentationModeWasChanged(enterPresentation);
 		stagePane.updateCostume();
-		SCRATCH::allow3d {
+		SCRATCH::allow3d
+		{
 			if (isIn3D) render3D.onStageResize();
 		}
 	}
@@ -913,13 +923,12 @@ public class Scratch extends Sprite
 		initScriptsPart();
 		initImagesPart();
 		soundsPart = new SoundsPart(this);
+		debugConsole = new DebugConsole();
 		addChild(topBarPart);
+		addChild(debugConsole);
 		addChild(stagePart);
 		addChild(libraryPart);
 		addChild(tabsPart);
-		
-		debugConsole = new DebugConsole();
-		addChild(debugConsole);
 	}
 
 	protected function getStagePart():StagePart {

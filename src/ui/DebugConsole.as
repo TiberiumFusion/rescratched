@@ -153,6 +153,7 @@ package ui
 					{
 						commandRecordSpot--;
 						input.text = commandRecord[commandRecordSpot];
+						input.setSelection(input.text.length, input.text.length);
 					}
 				}
 				// Down arrow
@@ -162,6 +163,7 @@ package ui
 					{
 						commandRecordSpot++;
 						input.text = commandRecord[commandRecordSpot];
+						input.setSelection(input.text.length, input.text.length);
 					}
 				}
 			}

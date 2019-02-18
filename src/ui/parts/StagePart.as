@@ -51,6 +51,7 @@ public class StagePart extends UIPart {
 	protected var projectInfo:TextField;
 	private var versionInfo:TextField;
 	private var turboIndicator:TextField;
+	private var rendermodeIndicator:TextField;
 	private var runButton:IconButton;
 	private var stopButton:IconButton;
 	private var fullscreenButton:IconButton;
@@ -81,6 +82,7 @@ public class StagePart extends UIPart {
 		addRunStopButtons();
 		addRecordingTools();
 		addTurboIndicator();
+		addRendermodeIndicator();
 		addFullScreenButton();
 		addXYReadouts();
 		addStageSizeButton();
@@ -149,6 +151,7 @@ public class StagePart extends UIPart {
 		projectInfo.visible = app.editMode;
 		stageSizeButton.visible = app.editMode;
 		turboIndicator.visible = app.interp.turboMode;
+		UpdateRenderModeIndicator();
 		fullscreenButton.visible = !app.isSmallPlayer;
 		stopRecordingButton.visible = (app.runtime.ready==ReadyLabel.COUNTDOWN || app.runtime.recording) && app.editMode;
 		videoProgressBar.visible = (app.runtime.ready==ReadyLabel.COUNTDOWN || app.runtime.recording) && app.editMode;
@@ -161,6 +164,11 @@ public class StagePart extends UIPart {
 		}
 		if (userNameWarning) userNameWarning.visible = app.usesUserNameBlock;
 		updateProjectInfo();
+	}
+	
+	public function UpdateRenderModeIndicator():void
+	{
+		rendermodeIndicator.text = Scratch.app.isIn3D ? "3D" : "2D";
 	}
 
 	// -----------------------------
@@ -194,6 +202,9 @@ public class StagePart extends UIPart {
 
 		turboIndicator.x = w - turboIndicator.width - 73;
 		turboIndicator.y = app.isSmallPlayer ? 5 : (app.editMode ? 22 : 12);
+		
+		rendermodeIndicator.x = w - 45;
+		rendermodeIndicator.y = app.isSmallPlayer ? 4 : 24;
 
 		fullscreenButton.x = 11;
 		fullscreenButton.y = stopButton.y - 1;
@@ -353,6 +364,16 @@ public class StagePart extends UIPart {
 		turboIndicator.text = Translator.map('Turbo Mode');
 		turboIndicator.visible = false;
 		addChild(turboIndicator);
+	}
+	
+	private function addRendermodeIndicator():void {
+		rendermodeIndicator = new TextField();
+		rendermodeIndicator.defaultTextFormat = new TextFormat(CSS.font, 10, CSS.buttonLabelOverColor, true);
+		rendermodeIndicator.autoSize = TextFieldAutoSize.LEFT;
+		rendermodeIndicator.selectable = false;
+		rendermodeIndicator.visible = true;
+		UpdateRenderModeIndicator();
+		addChild(rendermodeIndicator);
 	}
 
 	private function addXYReadouts():void {
