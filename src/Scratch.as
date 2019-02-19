@@ -394,9 +394,9 @@ public class Scratch extends Sprite
 		RSLoader.BeginLoadSMEProject(projectID);
 	}
 	// Callback when the project bytes requested by the RescratchedLoader have been retrieved
-	public function loadFromSMEProjectLoaded(projectEncoded:String):void
+	public function loadFromSMEProjectLoaded(encodedConcat:String):void
 	{
-		RSLoader.ParseProjectBytesBase64(projectEncoded);
+		RSLoader.ParseProjectBytesBase64(encodedConcat);
 	}
 	// If the retrieval fails, it'll most likely be a 404 or 403 due to the user-specified ID being a Scratch 3.0 project
 	public function loadFromSMEProjectHTMLError(errorCode:String):void

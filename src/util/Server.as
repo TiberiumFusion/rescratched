@@ -104,6 +104,11 @@ public class Server implements IServer {
 		return URLs.siteCdnPrefix + URLs.staticFiles;
 	}
 	
+	// Links to the viewer page for a project
+	public function GetProjectPageUrl(projectID:String):String
+	{
+		return URLs["sitePrefix"] + "projects/" + projectID + "/";
+	}
 	// Links to either an entire SB project or an SB2 project JSON
 	public function GetProjectBytesUrl(projectID:String):String
 	{

@@ -37,8 +37,8 @@ package inappd
 		public static const Msg_ProjectBytesAreSB2:FormattedStringList = new FormattedStringList(new FormattedString("Retrieved bytes are an SB2 file", CSS.consoleTextRegularFormat));
 		public static const Msg_ProjectBytesAreSB2JSON:FormattedStringList = new FormattedStringList(new FormattedString("Retrieved bytes are (probably) Scratch 2.0 JSON", CSS.consoleTextRegularFormat));
 		public static const Msg_ProjectBytesAreSB3JSON:FormattedStringList = new FormattedStringList(new FormattedString("Retrieved bytes are Scratch 3.0 JSON", CSS.consoleTextRegularFormat));
-		public static const Msg_InstallingSBProject:FormattedStringList = new FormattedStringList(new FormattedString("Installing SB project...", CSS.consoleTextRegularFormat));
-		public static const Msg_InstallingSB2Project:FormattedStringList = new FormattedStringList(new FormattedString("Installing SB2 project...", CSS.consoleTextRegularFormat));
+		public static const Msg_ParsingSBProject:FormattedStringList = new FormattedStringList(new FormattedString("Parsing SB project...", CSS.consoleTextRegularFormat));
+		public static const Msg_ParsingSB2Project:FormattedStringList = new FormattedStringList(new FormattedString("Parsing SB2 project...", CSS.consoleTextRegularFormat));
 		public static const Msg_ProjectGenericInstallFail:FormattedStringList = new FormattedStringList(new FormattedString("Project failed to install", CSS.consoleTextRegularFormat));
 		public static const Msg_RescratchedLoaderConflict:FormattedStringList = new FormattedStringList(new FormattedString("Rescratched is already in the process of retrieving a project from scratch.mit.edu. You must wait for this to finish before retrieving another one.", CSS.consoleTextRegularFormat));
 		public static const Msg_LoadSMEProjectNoJS:FormattedStringList = new FormattedStringList(new FormattedString("Cannot retrieve project, JS interface is unavailable", CSS.consoleTextRegularFormat));

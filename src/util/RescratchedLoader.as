@@ -23,6 +23,7 @@ package util
 		private var _Finished:Boolean = false;
 		public function get Finished():Boolean { return _Finished; }
 		
+		private var projectTitle:String;
 		private var projectBytes:ByteArray;
 		private var projectJSON:Object;
 		private var projectStage:ScratchStage;
@@ -63,14 +64,15 @@ package util
 				return;
 			}
 			
-			var getURL:String = Scratch.app.server.GetProjectBytesUrl(pIDClean);
+			var bytesURL:String = Scratch.app.server.GetProjectBytesUrl(pIDClean);
+			var titleURL:String = Scratch.app.server.GetProjectPageUrl(pIDClean);
 			
 			// Hand off to JS for now, which will return to us with the project data (hopefully)
 			if (Scratch.app.jsEnabled)
 			{
 				Scratch.app.LogToDebugConsole(DebugMessages.Tag_RescratchedLoader, DebugMessages.Msg_LoadSMEProjectGetProject(pIDClean));
 				// Must use JS to get the project data from SME
-				Scratch.app.externalCall("JSSMELoadProjectBytes", null, getURL);
+				Scratch.app.externalCall("JSSMELoadProjectBytes", null, bytesURL + "|" + titleURL);
 				
 				// Execution will resume in the ParseProjectBytesBase64() or ProjectLoadHTMLError() method
 			}
@@ -83,18 +85,22 @@ package util
 		}
 		
 		///// JS return calls this to send us the retrieved project bytes
-		public function ParseProjectBytesBase64(encoded:String):void
+		public function ParseProjectBytesBase64(encodedConcat:String):void
 		{
 			if (_Aborted)
 				return;
+				
+			var splitValues:Array = encodedConcat.split("|");
+			var projectEncoded:String = splitValues[0];
+			var titleEncoded:String = splitValues[1];
 			
-			if (encoded == null)
+			if (projectEncoded == null)
 			{
 				Scratch.app.LogToDebugConsole(DebugMessages.Tag_RescratchedLoader, DebugMessages.Msg_LoadSMEProjectGotNull);
 				FinishLoad();
 				return;
 			}
-			projectBytes = Base64Encoder.decode(encoded);
+			projectBytes = Base64Encoder.decode(projectEncoded);
 			if (projectBytes.length == 0)
 			{
 				Scratch.app.LogToDebugConsole(DebugMessages.Tag_RescratchedLoader, DebugMessages.Msg_LoadSMEProjectZeroLength);
@@ -111,18 +117,23 @@ package util
 			{
 				Scratch.app.LogToDebugConsole(DebugMessages.Tag_RescratchedLoader, DebugMessages.Msg_LoadSMEProjectProbablySuccessful(projectBytes.length));
 				
+				// Decode title
+				var titleBytes:ByteArray = Base64Encoder.decode(titleEncoded);
+				projectTitle = titleBytes.readUTFBytes(titleBytes.length);
+				
+				// Parse project bytes
 				try
 				{
 					if (ObjReader.isOldProject(projectBytes)) // SB file
 					{
 						Scratch.app.LogToDebugConsole(DebugMessages.Tag_RescratchedLoader, DebugMessages.Msg_ProjectBytesAreSB);
-						Scratch.app.runtime.installProjectFromBytes(projectBytes);
+						Scratch.app.runtime.installProjectFromBytes(projectBytes, projectTitle);
 						FinishLoad();
 					}
 					else if (bytesArePackedSB2(projectBytes)) // SB2 file
 					{
 						Scratch.app.LogToDebugConsole(DebugMessages.Tag_RescratchedLoader, DebugMessages.Msg_ProjectBytesAreSB2);
-						Scratch.app.runtime.installProjectFromBytes(projectBytes);
+						Scratch.app.runtime.installProjectFromBytes(projectBytes, projectTitle);
 						FinishLoad();
 					}
 					else // Must be JSON (or garbage)
@@ -222,6 +233,9 @@ package util
 			// Complete the project install
 			installAssets(projectStage.allObjects(), projectAssetsMap);
 			app.runtime.decodeImagesAndInstall(projectStage);
+			
+			// Set project title on stage
+			Scratch.app.setProjectName(projectTitle);
 			
 			FinishLoad();
 		}

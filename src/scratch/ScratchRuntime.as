@@ -836,7 +836,7 @@ public class ScratchRuntime {
 		data.position = 0;
 		if (data.length < 8 || data.readUTFBytes(8) != 'ScratchV') // Scratchr2 project
 		{
-			Scratch.app.LogToDebugConsole(DebugMessages.Tag_ScratchRuntime, DebugMessages.Msg_InstallingSB2Project);
+			Scratch.app.LogToDebugConsole(DebugMessages.Tag_ScratchRuntime, DebugMessages.Msg_ParsingSB2Project);
 			
 			data.position = 0;
 			newProject = new ProjectIO(app).decodeProjectFromZipFile(data);
@@ -847,7 +847,7 @@ public class ScratchRuntime {
 		}
 		else // Scratch 1.4 project
 		{
-			Scratch.app.LogToDebugConsole(DebugMessages.Tag_ScratchRuntime, DebugMessages.Msg_InstallingSBProject);
+			Scratch.app.LogToDebugConsole(DebugMessages.Tag_ScratchRuntime, DebugMessages.Msg_ParsingSBProject);
 			
 			var info:Object;
 			var objTable:Array;
