@@ -191,7 +191,7 @@ public class StagePart extends UIPart {
 		if (app.stagePane) app.stagePane.y = topBarHeight;
 
 		projectTitle.x = 50;
-		projectTitle.y = app.isOffline ? 8 : 2;
+		projectTitle.y = 5;
 		projectInfo.x = projectTitle.x + 3;
 		projectInfo.y = projectTitle.y + 18;
 
@@ -201,7 +201,7 @@ public class StagePart extends UIPart {
 		stopButton.y = runButton.y + 1;
 
 		turboIndicator.x = w - turboIndicator.width - 73;
-		turboIndicator.y = app.isSmallPlayer ? 5 : (app.editMode ? 22 : 12);
+		turboIndicator.y = app.isSmallPlayer ? 4 : 24;
 		
 		rendermodeIndicator.x = w - 45;
 		rendermodeIndicator.y = app.isSmallPlayer ? 4 : 24;
@@ -337,8 +337,9 @@ public class StagePart extends UIPart {
 		}
 	}
 	
-	private function addTitleAndInfo():void {
-		var fmt:TextFormat = app.isOffline ? new TextFormat(CSS.font, 16, CSS.textColor) : CSS.projectTitleFormat;
+	private function addTitleAndInfo():void
+	{
+		var fmt:TextFormat = CSS.projectTitleFormat;
 		projectTitle = getProjectTitle(fmt);
 		addChild(projectTitle);
 
@@ -356,21 +357,25 @@ public class StagePart extends UIPart {
 		versionInfo.text = newVersion;
 	}
 
-	private function addTurboIndicator():void {
+	private function addTurboIndicator():void
+	{
 		turboIndicator = new TextField();
-		turboIndicator.defaultTextFormat = new TextFormat(CSS.font, 11, CSS.buttonLabelOverColor, true);
+		turboIndicator.defaultTextFormat = new TextFormat(CSS.font, 10, CSS.buttonLabelOverColor, true);
 		turboIndicator.autoSize = TextFieldAutoSize.LEFT;
 		turboIndicator.selectable = false;
 		turboIndicator.text = Translator.map('Turbo Mode');
+		turboIndicator.antiAliasType = AntiAliasType.ADVANCED;
 		turboIndicator.visible = false;
 		addChild(turboIndicator);
 	}
 	
-	private function addRendermodeIndicator():void {
+	private function addRendermodeIndicator():void
+	{
 		rendermodeIndicator = new TextField();
 		rendermodeIndicator.defaultTextFormat = new TextFormat(CSS.font, 10, CSS.buttonLabelOverColor, true);
 		rendermodeIndicator.autoSize = TextFieldAutoSize.LEFT;
 		rendermodeIndicator.selectable = false;
+		rendermodeIndicator.antiAliasType = AntiAliasType.ADVANCED;
 		rendermodeIndicator.visible = true;
 		UpdateRenderModeIndicator();
 		addChild(rendermodeIndicator);
@@ -391,8 +396,9 @@ public class StagePart extends UIPart {
 		readouts.addChild(yReadout);
 	}
 
-	protected function updateProjectInfo():void {
-		projectTitle.setEditable(false);
+	protected function updateProjectInfo():void
+	{
+		projectTitle.setEditable(true);
 		projectInfo.text = '';
 	}
 

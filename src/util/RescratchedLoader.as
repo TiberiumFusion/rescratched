@@ -224,10 +224,10 @@ package util
 			
 			// Create asset map
 			projectAssetsMap = new Object();
-			for (var i:int = 0; i < projectAssetsMD5s.length; i++)
+			for (var i2:int = 0; i2 < projectAssetsMD5s.length; i2++)
 			{
-				var decoded:ByteArray = Base64Encoder.decode(assets[i]);
-				projectAssetsMap[projectAssetsMD5s[i]] = decoded;
+				var decoded:ByteArray = Base64Encoder.decode(assets[i2]);
+				projectAssetsMap[projectAssetsMD5s[i2]] = decoded;
 			}
 			
 			// Complete the project install
