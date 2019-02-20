@@ -48,6 +48,7 @@ public class CSS {
 	public static const borderDarker1Color:int = 0xBCBDBE;
 	public static const borderDarker2Color:int = 0x7C7E81;
 	public static const textColor:int = 0x5C5D5F; // 0x6C6D6F
+	public static const textLighterColor:int = 0xB0B1B3;
 	public static const buttonLabelColor:int = textColor;
 	public static const buttonLabelOverColor:int = 0xFBA939;
 	public static const offColor:int = 0x8F9193; // 0x9FA1A3
@@ -56,7 +57,8 @@ public class CSS {
 	public static const arrowColor:int = 0xA6A8AC;
 	public static const consoleTextColor:int = 0x454647;
 	public static const consoleTextDarkerColor:int = 0x272829;
-
+	public static const iupsReadoutLineColor:int = 0xCDCECF;
+	
 	// scratch-flash fonts
 	public static const font:String = Resources.chooseFont(['Arial', 'Verdana', 'DejaVu Sans']);
 	public static const menuFontSize:int = 12;

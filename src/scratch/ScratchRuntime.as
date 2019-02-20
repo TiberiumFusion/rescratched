@@ -88,12 +88,24 @@ public class ScratchRuntime {
 
 	protected var projectToInstall:ScratchStage;
 	protected var saveAfterInstall:Boolean;
+	
+	// IUPS counter
+	private var iupsBuffer:Vector.<Number> = new Vector.<Number>();
+	private var iupsLast:Number;
+	public var IUPSCounterEnabled:Boolean = true;
+	private var _iups:Number;
+	public function get IUPS():Number { return _iups; } // Interpreter Updates per Second
 
-	public function ScratchRuntime(app:Scratch, interp:Interpreter) {
+	public function ScratchRuntime(app:Scratch, interp:Interpreter)
+	{
 		this.app = app;
 		this.interp = interp;
 		timerBase = interp.currentMSecs;
 		clearKeyDownArray();
+		
+		for (var i:int = 0; i < 3; i++)
+			iupsBuffer.push(0);
+		iupsLast = MillisTime.MillisNow();
 	}
 
 	// -----------------------------
@@ -175,13 +187,30 @@ public class ScratchRuntime {
 		app.extensionManager.step();
 		if (motionDetector) motionDetector.step(); // Video motion detection
 
-		// Step the stage, sprites, and watchers
+		///// Step the stage, sprites, and watchers
 		app.stagePane.step(this);
 
-		// run scripts and commit any pen strokes
+		///// Run scripts and commit any pen strokes
 		processEdgeTriggeredHats();
 		interp.stepThreads();
 		app.stagePane.commitPenStrokes();
+		
+		///// Update IUPS counter
+		if (IUPSCounterEnabled)
+		{
+			var instant:Number = MillisTime.MillisNow();
+			var diff:Number = instant - iupsLast;
+			iupsBuffer.shift();
+			iupsBuffer.push(diff);
+			iupsLast = instant;
+			var bufferTime:Number = 0;
+			for (var i:int = 0; i < iupsBuffer.length; i++)
+				bufferTime += iupsBuffer[i];
+			_iups = 1000.0 / (bufferTime / iupsBuffer.length);
+		}
+		else
+			_iups = 0;
+			
 		
 		if (ready==ReadyLabel.COUNTDOWN || ready==ReadyLabel.READY) {
 			app.stagePane.countdown(count);
