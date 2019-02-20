@@ -34,13 +34,17 @@ package ui.parts {
 	import scratch.*;
 	import translation.Translator;
 	import uiwidgets.*;
+	import util.MillisTime;
 
 public class StagePart extends UIPart {
 
-	private const readoutTextColor:int = Scratch.app.isExtensionDevMode ? CSS.white : CSS.textColor;
-	private const readoutLabelFormat:TextFormat = new TextFormat(CSS.font, 12, readoutTextColor, true);
-	private const readoutFormat:TextFormat = new TextFormat(CSS.font, 10, readoutTextColor);
+	private const xyReadoutTextColor:int = Scratch.app.isExtensionDevMode ? CSS.white : CSS.textColor;
+	private const xyReadoutLabelFormat:TextFormat = new TextFormat(CSS.font, 12, xyReadoutTextColor, true);
+	private const xyReadoutFormat:TextFormat = new TextFormat(CSS.font, 10, xyReadoutTextColor);
 
+	private const iupsReadoutLabelFormat:TextFormat = new TextFormat(CSS.font, 10, CSS.textLighterColor, true);
+	private const iupsReadoutValueFormat:TextFormat = new TextFormat(CSS.font, 10, CSS.textLighterColor);
+	
 	private const topBarHeightNormal:int = 39;
 	private const topBarHeightSmallPlayerMode:int = 26;
 
@@ -68,13 +72,21 @@ public class StagePart extends UIPart {
 	private var runButtonOnTicks:int;
 
 	// x-y readouts
-	private var readouts:Sprite; // readouts that appear below the stage
+	private var xyReadouts:Sprite; // readouts that appear below the stage
 	private var xLabel:TextField;
 	private var xReadout:TextField;
 	private var yLabel:TextField;
 	private var yReadout:TextField;
 
-	public function StagePart(app:Scratch) {
+	// Performance readout (below the stage on the bottom left, on the same line as the XY readout)
+	private var perfReadout:Sprite;
+	private var perfIUPSLabel:TextField;
+	private var perfIUPSValue:TextField;
+	private var perfIUPSLine:Shape;
+	private var perfIUPSrefreshLast:Number;
+	
+	public function StagePart(app:Scratch)
+	{
 		this.app = app;
 		outline = new Shape();
 		addChild(outline);
@@ -85,6 +97,7 @@ public class StagePart extends UIPart {
 		addRendermodeIndicator();
 		addFullScreenButton();
 		addXYReadouts();
+		addPerfReadout();
 		addStageSizeButton();
 		fixLayout();
 		addEventListener(MouseEvent.MOUSE_WHEEL, mouseWheel);
@@ -146,7 +159,8 @@ public class StagePart extends UIPart {
 		if ((app.runtime.ready==ReadyLabel.COUNTDOWN || app.runtime.ready==ReadyLabel.READY) && !stopRecordingButton.isDisabled()) {
 			resetTime();
 		}
-		readouts.visible = app.editMode;
+		xyReadouts.visible = app.editMode;
+		perfReadout.visible = app.editMode;
 		projectTitle.visible = app.editMode;
 		projectInfo.visible = app.editMode;
 		stageSizeButton.visible = app.editMode;
@@ -187,7 +201,8 @@ public class StagePart extends UIPart {
 		versionInfo.visible = !fullscreenButton.isOn();
 	}
 
-	protected function fixLayout():void {
+	protected function fixLayout():void
+	{
 		if (app.stagePane) app.stagePane.y = topBarHeight;
 
 		projectTitle.x = 50;
@@ -225,6 +240,15 @@ public class StagePart extends UIPart {
 		var top:int = h + 1;
 		xReadout.y = yReadout.y = top;
 		xLabel.y = yLabel.y = top - 2;
+		
+		// Perf readout
+		perfIUPSLabel.x = 0;
+		perfIUPSValue.x = 31;
+		perfIUPSLabel.y = top - 2;
+		perfIUPSValue.y = top - 2;
+		perfIUPSLine.x = 2;
+		perfIUPSLine.y = top + 13;
+		perfIUPSLine.scaleX = 1.0;
 		
 		//recording tools
 		stopRecordingButton.x=2;
@@ -382,20 +406,39 @@ public class StagePart extends UIPart {
 	}
 
 	private function addXYReadouts():void {
-		readouts = new Sprite();
-		addChild(readouts);
+		xyReadouts = new Sprite();
+		addChild(xyReadouts);
 
-		xLabel = makeLabel('x:', readoutLabelFormat);
-		readouts.addChild(xLabel);
-		xReadout = makeLabel('-888', readoutFormat);
-		readouts.addChild(xReadout);
+		xLabel = makeLabel('x:', xyReadoutLabelFormat);
+		xyReadouts.addChild(xLabel);
+		xReadout = makeLabel('-888', xyReadoutFormat);
+		xyReadouts.addChild(xReadout);
 
-		yLabel = makeLabel('y:', readoutLabelFormat);
-		readouts.addChild(yLabel);
-		yReadout = makeLabel('-888', readoutFormat);
-		readouts.addChild(yReadout);
+		yLabel = makeLabel('y:', xyReadoutLabelFormat);
+		xyReadouts.addChild(yLabel);
+		yReadout = makeLabel('-888', xyReadoutFormat);
+		xyReadouts.addChild(yReadout);
 	}
 
+	private function addPerfReadout():void
+	{
+		perfReadout = new Sprite();
+		addChild(perfReadout);
+		
+		perfIUPSLabel = makeLabel("IUPS:", iupsReadoutLabelFormat);
+		perfReadout.addChild(perfIUPSLabel);
+		perfIUPSValue = makeLabel("0", iupsReadoutValueFormat);
+		perfReadout.addChild(perfIUPSValue);
+		
+		perfIUPSLine = new Shape();
+		perfIUPSLine.graphics.beginFill(CSS.iupsReadoutLine);
+		perfIUPSLine.graphics.drawRect(0, 0, 58, 1);
+		perfIUPSLine.graphics.endFill();
+		addChild(perfIUPSLine);
+		
+		perfIUPSrefreshLast = MillisTime.MillisNow();
+	}
+	
 	protected function updateProjectInfo():void
 	{
 		projectTitle.setEditable(true);
@@ -408,7 +451,11 @@ public class StagePart extends UIPart {
 
 	public function step():void {
 		updateRunStopButtons();
-		if (app.editMode) updateMouseReadout();
+		if (app.editMode)
+		{
+			updateMouseReadout();
+			updateIUPSReadout();
+		}
 	}
 
 	private function updateRunStopButtons():void {
@@ -436,6 +483,17 @@ public class StagePart extends UIPart {
 		if (stage.mouseY != lastY) {
 			lastY = app.stagePane.scratchMouseY();
 			yReadout.text = String(lastY);
+		}
+	}
+	
+	private function updateIUPSReadout():void
+	{
+		var instant:Number = MillisTime.MillisNow();
+		if (instant - perfIUPSrefreshLast > 200) // Update periodicially so that the readout doesn't move too fast
+		{
+			perfIUPSValue.text = String(Scratch.app.runtime.IUPS.toPrecision(4));
+			perfIUPSrefreshLast = instant;
+			perfIUPSLine.scaleX = Scratch.app.runtime.IUPS / stage.frameRate;
 		}
 	}
 
