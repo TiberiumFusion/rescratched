@@ -83,6 +83,7 @@ public class ProjectIO {
 		delete proj.info.penTrails; // remove the penTrails bitmap saved in some old projects' info
 		proj.savePenLayer();
 		proj.updateInfo();
+		proj.updateRescratchedExtra();
 		recordImagesAndSounds(proj.allObjects(), false, proj);
 		var zip:ZipIO = new ZipIO();
 		zip.startWrite();

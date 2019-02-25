@@ -14,7 +14,7 @@ package inappd
 		///// Standard message tags. Always 6 chars, where the first and last are either brackets or spaces
 		public static const Tag_NeutralNoChange:FormattedString = new FormattedString("------", new TextFormat("InconsolataRegular", 12, 0x737373));
 		public static const Tag_ValidUserCmd:FormattedString = new FormattedString("    >>", new TextFormat("InconsolataBold", 12, 0x353535));
-		public static const Tag_InvalidUserCmd:FormattedString = new FormattedString("---- x", new TextFormat("InconsolataRegular", 12, 0xB32222));
+		public static const Tag_InvalidUserCmd:FormattedString = new FormattedString("---- x", new TextFormat("InconsolataRegular", 12, 0xE11111));
 		public static const Tag_BadUserInput:FormattedString = new FormattedString("xxxx x", new TextFormat("InconsolataRegular", 12, 0xE2760A));
 		public static const Tag_ScratchStage:FormattedString = new FormattedString("[SSTG]", new TextFormat("InconsolataBold", 12, 0x257317));
 		public static const Tag_ServerClient:FormattedString = new FormattedString("[SVCL]", new TextFormat("InconsolataBold", 12, 0x1E9FBB));

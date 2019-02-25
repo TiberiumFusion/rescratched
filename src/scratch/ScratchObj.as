@@ -598,7 +598,8 @@ public class ScratchObj extends Sprite {
 		json.writeKeyValue('currentCostumeIndex', currentCostumeIndex);
 	}
 
-	public function readJSON(jsonObj:Object):void {
+	public function readJSON(jsonObj:Object):void
+	{
 		objName = jsonObj.objName;
 		variables = jsonObj.variables || [];
 		for (var i:int = 0; i < variables.length; i++) {
@@ -612,6 +613,8 @@ public class ScratchObj extends Sprite {
 		costumes = jsonObj.costumes || [];
 		currentCostumeIndex = jsonObj.currentCostumeIndex;
 		if (isNaNOrInfinity(currentCostumeIndex)) currentCostumeIndex = 0;
+		
+		
 	}
 
 	private function isNaNOrInfinity(n:Number):Boolean {

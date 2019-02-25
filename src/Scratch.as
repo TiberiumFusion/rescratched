@@ -28,6 +28,8 @@ import inappd.DebugCommandOrganizer;
 import inappd.DebugMessages;
 import inappd.FormattedString;
 import inappd.FormattedStringList;
+import ui.windows.DialogProjectPreferences;
+import ui.windows.DialogProjectPreferencesEvent;
 
 import com.adobe.utils.StringUtil;
 
@@ -98,6 +100,9 @@ public class Scratch extends Sprite
 	public var isMicroworld:Boolean = false;
 
 	public var presentationScale:Number;
+	
+	public var userPrefs:UserPrefs;
+	private var dialogPrefs:DialogProjectPreferences;
 	
 	// Runtime
 	public var runtime:ScratchRuntime;
@@ -178,7 +183,11 @@ public class Scratch extends Sprite
 		initialize();
 	}
 
-	protected function initialize():void {
+	protected function initialize():void
+	{
+		userPrefs = new UserPrefs();
+		// TODO: retrieve eventual user preferences from flashvars
+		
 		isOffline = !URLUtil.isHttpURL(loaderInfo.url);
 		hostProtocol = URLUtil.getProtocol(loaderInfo.url);
 
@@ -190,7 +199,7 @@ public class Scratch extends Sprite
 
 		stage.align = StageAlign.TOP_LEFT;
 		stage.scaleMode = StageScaleMode.NO_SCALE;
-		stage.frameRate = 30;
+		stage.frameRate = userPrefs.DefaultProjectPrefs.InitialFlashStageTargetFPS;
 
 		if (stage.hasOwnProperty('color')) {
 			// Stage doesn't have a color property on Air 2.6, and Linux throws if you try to set it anyway.
@@ -795,9 +804,19 @@ public class Scratch extends Sprite
 		stagePane.updateCostume();
 	}
 
-	public function projectLoaded():void {
+	public function projectLoaded():void
+	{
+		// Remove any UI elements if necessary
 		removeLoadProgressBox();
-		System.gc();
+		if (dialogPrefs != null && dialogPrefs)
+		{
+			removeChild(dialogPrefs);
+			dialogPrefs = null;
+		}
+		
+		// System.gc(); this only works in debug builds
+		System.pauseForGCIfCollectionImminent(0.01);
+		
 		if (autostart) runtime.startGreenFlags(true);
 		loadInProgress = false;
 		saveNeeded = false;
@@ -908,6 +927,25 @@ public class Scratch extends Sprite
 		setTab('scripts');
 		scriptsPart.resetCategory();
 		wasEdited = false;
+	}
+	
+	public function ConfigFromProjPrefs(otherPrefs:ProjectPrefs = null):void
+	{
+		var usePrefs:ProjectPrefs = stagePane.projectPrefs;
+		if (otherPrefs != null)
+			usePrefs = otherPrefs;
+			
+		// Render mode
+		if (usePrefs.InitialRenderMode == "3d")
+			Scratch.app.go3D();
+		else if (usePrefs.InitialRenderMode == "2d")
+			Scratch.app.go2D();
+			
+		// Turbo
+		Scratch.app.setTurboMode(usePrefs.InitialTurbo);
+		
+		// Flash stage framerate
+		Scratch.app.stage.frameRate = usePrefs.InitialFlashStageTargetFPS;
 	}
 
 	protected function shouldShowGreenFlag():Boolean {
@@ -1175,14 +1213,21 @@ public class Scratch extends Sprite
 		runtime.stopVideo();
 	}
 
-	protected function addFileMenuItems(b:*, m:Menu):void {
+	protected function addFileMenuItems(b:*, m:Menu):void
+	{
 		m.addItem('Load Project', runtime.selectProjectFile);
 		m.addItem('Save Project', exportProjectToFile);
+		
+		m.addLine();
+		m.addItem('Project Preferences', editProjectPreferences);
+		
+		m.addLine();
 		if (runtime.recording || runtime.ready==ReadyLabel.COUNTDOWN || runtime.ready==ReadyLabel.READY) {
 			m.addItem('Stop Video', runtime.stopVideo);
 		} else {
 			m.addItem('Record Project Video', runtime.exportToVideo);
 		}
+		
 		if (canUndoRevert()) {
 			m.addLine();
 			m.addItem('Undo Revert', undoRevert);
@@ -1196,6 +1241,7 @@ public class Scratch extends Sprite
 			m.addItem('Save Project Summary', saveSummary);
 			m.addItem('Show version details', showVersionDetails);
 		}
+		
 		if (b.lastEvent.shiftKey && jsEnabled) {
 			m.addLine();
 			m.addItem('Import experimental extension', function ():void {
@@ -1373,6 +1419,12 @@ public class Scratch extends Sprite
 		else
 			LogToDebugConsole(DebugMessages.Tag_ScratchStage, DebugMessages.Msg_TurboSetOff);
 	}
+	
+	public function setTurboMode(value:Boolean):void
+	{
+		interp.turboMode = !value;
+		toggleTurboMode();
+	}
 
 	public function handleTool(tool:String, evt:MouseEvent):void {
 	}
@@ -1397,6 +1449,20 @@ public class Scratch extends Sprite
 		var versionDetailsBox:DialogBox = makeVersionDetailsDialog();
 		versionDetailsBox.addButton('OK', versionDetailsBox.accept);
 		versionDetailsBox.showOnStage(stage);
+	}
+	
+	protected function editProjectPreferences():void
+	{
+		function dialogRequestClose():void
+		{
+			removeChild(dialogPrefs);
+			dialogPrefs = null;
+		}
+		dialogPrefs = new DialogProjectPreferences(stagePane.projectPrefs);
+		addChild(dialogPrefs);
+		dialogPrefs.x = (stage.stageWidth / 2) - (dialogPrefs.width / 2);
+		dialogPrefs.y = (stage.stageHeight / 2) - (dialogPrefs.height / 2);
+		dialogPrefs.addEventListener(DialogProjectPreferencesEvent.REQUEST_CLOSE, dialogRequestClose);
 	}
 
 	protected function toggleDebugConsole():void

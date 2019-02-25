@@ -49,6 +49,10 @@ public class ScratchStage extends ScratchObj {
 
 	public var info:Object = new Object();
 	public var tempoBPM:Number = 60;
+	
+	// Rescratched savedata extensions
+	public var rescratchedExtra:Object = new Object();
+	public var projectPrefs:ProjectPrefs;
 
 	public var penActivity:Boolean;
 	public var newPenStrokes:Shape;
@@ -71,7 +75,8 @@ public class ScratchStage extends ScratchObj {
 	private var videoAlpha:Number = 0.5;
 	private var flipVideo:Boolean = true;
 
-	public function ScratchStage() {
+	public function ScratchStage()
+	{
 		objName = 'Stage';
 		isStage = true;
 		scrollRect = new Rectangle(0, 0, STAGEW, STAGEH); // clip drawing to my bounds
@@ -86,6 +91,8 @@ public class ScratchStage extends ScratchObj {
 		addPenLayer();
 		initMedia();
 		showCostume(0);
+		
+		projectPrefs = ProjectPrefs.FromDefaultUserPrefs();
 	}
 
 	public function setTempo(bpm:Number):void {
@@ -752,7 +759,8 @@ public class ScratchStage extends ScratchObj {
 		return true;
 	}
 
-	public function updateInfo():void {
+	public function updateInfo():void
+	{
 		info.scriptCount = scriptCount();
 		info.spriteCount = spriteCount();
 		info.flashVersion = Capabilities.version;
@@ -802,6 +810,12 @@ public class ScratchStage extends ScratchObj {
 
 	public function spriteCount():int { return sprites().length }
 
+	// Assemble the rescratchedExtra savedata element
+	public function updateRescratchedExtra():void
+	{
+		rescratchedExtra.projectPrefs = this.projectPrefs.ToJSONCompatibleObject();
+	}
+
 	/* Dropping */
 
 	public function handleDrop(obj:*):Boolean {
@@ -830,7 +844,8 @@ public class ScratchStage extends ScratchObj {
 
 	/* Saving */
 
-	public override function writeJSON(json:util.JSON):void {
+	public override function writeJSON(json:util.JSON):void
+	{
 		super.writeJSON(json);
 		var children:Array = [];
 		for (var i:int = 0; i < numChildren; i++) {
@@ -853,25 +868,41 @@ public class ScratchStage extends ScratchObj {
 			}
 		}
 
+		// Scratch 2.0
 		json.writeKeyValue('penLayerMD5', penLayerMD5);
 		json.writeKeyValue('penLayerID', penLayerID);
 		json.writeKeyValue('tempoBPM', tempoBPM);
 		json.writeKeyValue('videoAlpha', videoAlpha);
 		json.writeKeyValue('children', children);
 		json.writeKeyValue('info', info);
+		
+		// Rescratched
+		if (Scratch.app.userPrefs.SavedataRescratchedExtras)
+			json.writeKeyValue('rescratchedExtra', rescratchedExtra);
 	}
 
-	public override function readJSON(jsonObj:Object):void {
+	public override function readJSON(jsonObj:Object):void
+	{
 		var children:Array, i:int, o:Object;
 
-		// read stage fields
+		// Read stage fields (Scratch 2.0 specification)
 		super.readJSON(jsonObj);
 		penLayerMD5 = jsonObj.penLayerMD5;
 		tempoBPM = jsonObj.tempoBPM;
 		if (jsonObj.videoAlpha) videoAlpha = jsonObj.videoAlpha;
 		children = jsonObj.children;
 		info = jsonObj.info;
-
+		
+		// Extended Rescratched project metadata
+		if (jsonObj.hasOwnProperty("rescratchedExtra"))
+		{
+			rescratchedExtra = jsonObj.rescratchedExtra;
+			projectPrefs = ProjectPrefs.FromJSONCompatibleObject(rescratchedExtra.projectPrefs);
+		}
+		else
+			rescratchedExtra = new Object();
+		
+		
 		// instantiate sprites and record their names
 		var spriteNameMap:Object = new Object();
 		spriteNameMap[objName] = this; // record stage's name
@@ -911,7 +942,7 @@ public class ScratchStage extends ScratchObj {
 			scratchObj.instantiateFromJSON(this);
 		}
 	}
-
+	
 	public override function getSummary():String {
 		var summary:String = super.getSummary();
 		for each (var s:ScratchSprite in sprites()) {
@@ -919,5 +950,5 @@ public class ScratchStage extends ScratchObj {
 		}
 		return summary;
 	}
-
+	
 }}

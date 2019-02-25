@@ -944,6 +944,10 @@ public class ScratchRuntime {
 		app.projectLoaded();
 		SCRATCH::allow3d { checkForGraphicEffects(); }
 		
+		///// Configure Scratch stage using the project's preferences
+		app.ConfigFromProjPrefs();
+		
+		
 		Scratch.app.LogToDebugConsole(DebugMessages.Tag_ScratchRuntime, DebugMessages.Msg_RuntimeInstalledProject);
 	}
 
