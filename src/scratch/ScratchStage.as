@@ -123,14 +123,17 @@ public class ScratchStage extends ScratchObj {
 		else {
 			addChild(counter);
 		}
-		addChild(arrowText=makeLabel("To stop recording, click the square",14));
+		addChild(arrowText = makeLabel("To stop recording, click the square",14));
 		arrowImage = Resources.createBmp('stopArrow');
-		arrowImage.x = 6;
+		if (Scratch.app.stageIsContracted)
+			arrowImage.x = 154;
+		else
+			arrowImage.x = 74;
 		arrowImage.y = 335;
 		addChild(arrowImage);
 		counter.x = (STAGEW-counter.width)/2;
 		counter.y = (STAGEH-counter.height)/2;
-		arrowText.x = 28;
+		arrowText.x = arrowImage.x + 22;
 		arrowText.y = 328;
 	}
 	

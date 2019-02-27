@@ -228,7 +228,7 @@ public class StagePart extends UIPart {
 		versionInfo.x = fullscreenButton.x + 1;
 		versionInfo.y = 27;
 
-		projectTitle.setWidth(runButton.x - projectTitle.x - 15);
+		projectTitle.setWidth(runButton.x - projectTitle.x - 35);
 
 		// x-y readouts
 		var left:int = w - 98; // w - 95
@@ -250,14 +250,14 @@ public class StagePart extends UIPart {
 		perfIUPSLine.y = top + 12;
 		
 		//recording tools
-		stopRecordingButton.x=2;
-		stopRecordingButton.y=top+2;
-		recordingIndicator.x=8+stopRecordingButton.width;
-		recordingIndicator.y=top+3;
-		recordingTime.x = recordingIndicator.x+recordingIndicator.width+6;
-		recordingTime.y=top;
-		videoProgressBar.x = recordingTime.x+42;
-		videoProgressBar.y=top+3;
+		stopRecordingButton.x = 72;
+		stopRecordingButton.y = top + 2;
+		recordingIndicator.x = stopRecordingButton.x + stopRecordingButton.width + 4;
+		recordingIndicator.y = top + 3;
+		recordingTime.x = recordingIndicator.x + recordingIndicator.width + 6;
+		recordingTime.y = top - 1;
+		videoProgressBar.x = recordingTime.x + 46;
+		videoProgressBar.y = top + 3;
 
 		stageSizeButton.x = w - 4;
 		stageSizeButton.y = h + 2;
@@ -278,9 +278,9 @@ public class StagePart extends UIPart {
 		var g:Graphics = videoProgressBar.graphics;
 		g.clear();
 		g.beginGradientFill(GradientType.LINEAR, [slotColor, CSS.borderColor], [1, 1], [0, 0]);
-		g.drawRoundRect(0, 0, 300, 10, slotRadius,slotRadius);
+		g.drawRoundRect(0, 0, 230, 10, slotRadius,slotRadius);
 		g.beginGradientFill(GradientType.LINEAR, [slotColor, slotColor2], [1, 1], [0, 0]);
-		g.drawRoundRect(0, .5, 300, 9,9,9);
+		g.drawRoundRect(0, 0.5, 230, 9, 9, 9);
 		g.endFill();
 		addChild(videoProgressBar);
 		
@@ -323,9 +323,9 @@ public class StagePart extends UIPart {
 		var g:Graphics = videoProgressBar.graphics;
 		var slotRadius:int = 10;
 		g.clear();
-		var barWidth:int = 300;
+		var barWidth:int = 230;
 		if (app.stageIsContracted) {
-			barWidth = 64;
+			barWidth = 80;
 		}
 		var m:Matrix = new Matrix();
 		m.createGradientBox(barWidth, 10, 0, int(time/60.0*barWidth), 0);
