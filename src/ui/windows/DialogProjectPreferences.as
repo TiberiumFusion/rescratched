@@ -5,9 +5,12 @@ package ui.windows
 	 * @author TiberiumFusion
 	 */
 	
+	import assets.Resources;
+	import assets.UI.UIStrings;
 	import flash.display.GradientType;
 	import flash.display.Graphics;
 	import flash.display.Shape;
+	import flash.display.SimpleButton;
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
 	import flash.filters.DropShadowFilter;
@@ -16,8 +19,10 @@ package ui.windows
 	import flash.text.TextFieldAutoSize;
 	import flash.text.TextFieldType;
 	import flash.text.TextFormat;
+	import flash.text.TextFormatAlign;
 	import scratch.ProjectPrefs;
 	import uiwidgets.Button;
+	import uiwidgets.DialogBox;
 	import uiwidgets.FauxGroupBox;
 	import uiwidgets.NumericUpDown;
 	import uiwidgets.NumericUpDownEvent;
@@ -42,12 +47,15 @@ package ui.windows
 		
 		private var labelRenderMode:TextField;
 		private var renderModeRadio:RadioButtonGroup;
+		private var helpRenderMode:SimpleButton;
 		
 		private var labelTurbo:TextField;
 		private var turboRadio:RadioButtonGroup;
+		private var helpTurbo:SimpleButton;
 		
 		private var labelFlashFPS:TextField;
 		private var flashFPSNumeric:NumericUpDown;
+		private var helpFlashFPS:SimpleButton;
 		
 		private var buttonSave:Button;
 		private var buttonApply:Button;
@@ -55,6 +63,9 @@ package ui.windows
 		private var buttonCancel:Button;
 		
 		private var tempPrefs:ProjectPrefs;
+		
+		// UI strings
+		private const uiStrings:Object = UIStrings.DisplayProjectPreferences;
 		
 		//////////////////////////////////////////// CTOR ////////////////////////////////////////////
 		public function DialogProjectPreferences(pp:ProjectPrefs)
@@ -68,53 +79,79 @@ package ui.windows
 			shape = new Shape();
 			addChild(shape);
 			
+			// Title label
+			title = new TextField();
+			title.defaultTextFormat = CSS.titleFormat;
+			title.autoSize = TextFieldAutoSize.CENTER;
+			title.selectable = false;
+			title.text = uiStrings.dialogTitle;
+			addChild(title);
+			
 			// GB for initial config settings
-			gbInitials = new FauxGroupBox("Initial Player Settings", Width - 36, Height - 90);
+			gbInitials = new FauxGroupBox(uiStrings.gbInitials_header, Width - 36, Height - 90);
 			addChild(gbInitials);
 			gbInitialsDesc = new TextField();
 			gbInitialsDesc.defaultTextFormat = descTextFormat;
 			gbInitialsDesc.selectable = false;
 			gbInitialsDesc.multiline = true;
 			gbInitialsDesc.wordWrap = true;
-			gbInitialsDesc.text = "These settings are applied only once, when the project loads. To manually re-apply these settings, click the Apply button. Green flag shift-click, Ctrl+M, and similar actions will not change these settings.";
+			gbInitialsDesc.text = uiStrings.gbInitials_desc;
 			addChild(gbInitialsDesc);
 			
-			// Title label
-			title = new TextField();
-			title.defaultTextFormat = CSS.titleFormat;
-			title.autoSize = TextFieldAutoSize.CENTER;
-			title.selectable = false;
-			title.text = "Project Properties";
-			addChild(title);
-			
 			// Option render mode
-			labelRenderMode = createLabel("Scratch stage render mode:");
+			labelRenderMode = createLabel(uiStrings.labelRenderMode);
 			addChild(labelRenderMode);
 			
 			renderModeRadio = new RadioButtonGroup();
-			renderModeRadio.AddOption("2D", "2d");
-			renderModeRadio.AddOption("3D", "3d");
+			renderModeRadio.AddOption(uiStrings.renderModeRadioOpt_2D, "2d");
+			renderModeRadio.AddOption(uiStrings.renderModeRadioOpt_3D, "3d");
 			addChild(renderModeRadio);
-			if (tempPrefs.InitialRenderMode == "2d") renderModeRadio.SelectByLabel("2D");
-			else if (tempPrefs.InitialRenderMode == "3d") renderModeRadio.SelectByLabel("3D");
+			if (tempPrefs.InitialRenderMode == "2d") renderModeRadio.SelectByLabel(uiStrings.renderModeRadioOpt_2D);
+			else if (tempPrefs.InitialRenderMode == "3d") renderModeRadio.SelectByLabel(uiStrings.renderModeRadioOpt_3D);
 			function renderModeRadio_Selected(e:RadioButtonGroupEvent):void { tempPrefs.InitialRenderMode = e.ButtonTag as String; }
 			renderModeRadio.addEventListener(RadioButtonGroupEvent.SELECTED, renderModeRadio_Selected);
 			
+			helpRenderMode = new SimpleButton(Resources.createBmp("helpIcon_Up"), Resources.createBmp("helpIcon_Over"), Resources.createBmp("helpIcon_Down"));
+			helpRenderMode.hitTestState = helpRenderMode.upState;
+			addChild(helpRenderMode);
+			function click_helpRenderMode(e:MouseEvent):void
+			{
+				var d:DialogBox = new DialogBox();
+				d.addTitle(uiStrings.helpPopup_renderMode_title);
+				d.addText(uiStrings.helpPopup_renderMode_desc, TextFormatAlign.LEFT, 500, true);
+				d.addButton(uiStrings.helpPopup_OK, d.accept);
+				d.showOnStage(stage);
+			}
+			helpRenderMode.addEventListener(MouseEvent.CLICK, click_helpRenderMode);
+			
 			// Option turbo mode
-			labelTurbo = createLabel("Turbo mode:");
+			labelTurbo = createLabel(uiStrings.labelTurbo);
 			addChild(labelTurbo);
 			
 			turboRadio = new RadioButtonGroup();
-			turboRadio.AddOption("Disabled", false);
-			turboRadio.AddOption("Enabled", true);
+			turboRadio.AddOption(uiStrings.turboRadioOpt_Disabled, false);
+			turboRadio.AddOption(uiStrings.turboRadioOpt_Enabled, true);
 			addChild(turboRadio);
-			if (tempPrefs.InitialTurbo) turboRadio.SelectByLabel("Enabled");
-			else turboRadio.SelectByLabel("Disabled");
+			if (tempPrefs.InitialTurbo) turboRadio.SelectByLabel(uiStrings.turboRadioOpt_Enabled);
+			else turboRadio.SelectByLabel(uiStrings.turboRadioOpt_Disabled);
 			function turboRadio_Selected(e:RadioButtonGroupEvent):void { tempPrefs.InitialTurbo = e.ButtonTag as Boolean; }
 			turboRadio.addEventListener(RadioButtonGroupEvent.SELECTED, turboRadio_Selected);
 			
+			helpTurbo = new SimpleButton(Resources.createBmp("helpIcon_Up"), Resources.createBmp("helpIcon_Over"), Resources.createBmp("helpIcon_Down"));
+			helpTurbo.hitTestState = helpTurbo.upState;
+			addChild(helpTurbo);
+			function click_helpTurbo(e:MouseEvent):void
+			{
+				var d:DialogBox = new DialogBox();
+				d.addTitle(uiStrings.helpPopup_turbo_title);
+				d.addText(uiStrings.helpPopup_turbo_desc, TextFormatAlign.LEFT, 450, true);
+				d.addButton(uiStrings.helpPopup_OK, d.accept);
+				d.showOnStage(stage);
+			}
+			helpTurbo.addEventListener(MouseEvent.CLICK, click_helpTurbo);
+			
 			// Option flash stage fps
-			labelFlashFPS = createLabel("Flash stage FPS:");
+			labelFlashFPS = createLabel(uiStrings.labelFlashFPS);
 			addChild(labelFlashFPS);
 			
 			flashFPSNumeric = new NumericUpDown(60, 30, 1, 240, 1, 0);
@@ -123,20 +160,33 @@ package ui.windows
 			function flashFPSNumeric_Changed(e:NumericUpDownEvent):void { tempPrefs.InitialFlashStageTargetFPS = e.Sender.Value; }
 			flashFPSNumeric.addEventListener(NumericUpDownEvent.CHANGED, flashFPSNumeric_Changed);
 			
+			helpFlashFPS = new SimpleButton(Resources.createBmp("helpIcon_Up"), Resources.createBmp("helpIcon_Over"), Resources.createBmp("helpIcon_Down"));
+			helpFlashFPS.hitTestState = helpFlashFPS.upState;
+			addChild(helpFlashFPS);
+			function click_helpFlashFPS(e:MouseEvent):void
+			{
+				var d:DialogBox = new DialogBox();
+				d.addTitle(uiStrings.helpPopup_flashFPS_title);
+				d.addText(uiStrings.helpPopup_flashFPS_desc, TextFormatAlign.LEFT, 600, true);
+				d.addButton(uiStrings.helpPopup_OK, d.accept);
+				d.showOnStage(stage);
+			}
+			helpFlashFPS.addEventListener(MouseEvent.CLICK, click_helpFlashFPS);
+			
 			// Button Save
-			buttonSave = new Button("Save", buttonOK_onClick);
+			buttonSave = new Button(uiStrings.buttonSave, buttonOK_onClick);
 			addChild(buttonSave);
 			
 			// Button Apply
-			buttonApply = new Button("Apply", buttonApply_onClick);
+			buttonApply = new Button(uiStrings.buttonApply, buttonApply_onClick);
 			addChild(buttonApply);
 			
 			// Button Save & Apply
-			buttonSaveApply = new Button("Save & Apply", buttonSaveApply_onClick);
+			buttonSaveApply = new Button(uiStrings.buttonSaveApply, buttonSaveApply_onClick);
 			addChild(buttonSaveApply);
 			
 			// Button Cancel
-			buttonCancel = new Button("Cancel", buttonCancel_onClick);
+			buttonCancel = new Button(uiStrings.buttonCancel, buttonCancel_onClick);
 			addChild(buttonCancel);
 			
 			// Initial layout
@@ -227,6 +277,8 @@ package ui.windows
 			labelRenderMode.y = topAdv;
 			renderModeRadio.x = labelRenderMode.x + labelRenderMode.textWidth + 20;
 			renderModeRadio.y = labelRenderMode.y;
+			helpRenderMode.x = Width - helpRenderMode.width - 30;
+			helpRenderMode.y = labelRenderMode.y + 1;
 			topAdv += renderModeRadio.height + vertSpacing;
 			
 			// Option turbo
@@ -234,6 +286,8 @@ package ui.windows
 			labelTurbo.y = topAdv;
 			turboRadio.x = labelTurbo.x + labelTurbo.textWidth + 20;
 			turboRadio.y = labelTurbo.y;
+			helpTurbo.x = Width - helpTurbo.width - 30;
+			helpTurbo.y = labelTurbo.y + 1;
 			topAdv += turboRadio.height + vertSpacing;
 			
 			// Option flash stage fps
@@ -241,6 +295,8 @@ package ui.windows
 			labelFlashFPS.y = topAdv;
 			flashFPSNumeric.x = labelFlashFPS.x + labelFlashFPS.textWidth + 20;
 			flashFPSNumeric.y = labelFlashFPS.y;
+			helpFlashFPS.x = Width - helpFlashFPS.width - 30;
+			helpFlashFPS.y = labelFlashFPS.y + 1;
 			topAdv += flashFPSNumeric.height + vertSpacing;
 			
 			// Button Apply

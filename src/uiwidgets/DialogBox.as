@@ -123,9 +123,9 @@ public class DialogBox extends Sprite {
 		addChild(title);
 	}
 
-	public function addText(text:String):void {
+	public function addText(text:String, align:String = TextFormatAlign.CENTER, setWidth:int = -1, isHtmlText:Boolean = false):void {
 		for each (var s:String in text.split('\n')) {
-			var line:TextField = makeLabel(Translator.map(s));
+			var line:TextField = makeLabel(Translator.map(s), false, align, setWidth, isHtmlText);
 			addChild(line);
 			textLines.push(line);
 		}
@@ -276,14 +276,28 @@ public class DialogBox extends Sprite {
 		if (parent != null) parent.removeChild(this);
 	}
 
-	private function makeLabel(s:String, forTitle:Boolean = false):TextField {
-		const normalFormat:TextFormat = new TextFormat(CSS.font, 14, CSS.textColor);
+	private function makeLabel(s:String, forTitle:Boolean = false, align:String = TextFormatAlign.CENTER, setWidth:int = -1, isHtmlText:Boolean = false):TextField {
+		const normalFormat:TextFormat = new TextFormat(CSS.font, 14, CSS.textColor, null, null, null, null, null, align);
 		var result:VariableTextField = new VariableTextField();
 		result.autoSize = TextFieldAutoSize.LEFT;
+		if (setWidth > -1)
+		{
+			result.width = setWidth;
+			result.multiline = true;
+			result.wordWrap = true;
+		}
 		result.selectable = false;
 		result.background = false;
-		result.setText(s, context);
-		result.setTextFormat(forTitle ? CSS.titleFormat : normalFormat);
+		if (isHtmlText)
+		{
+			result.defaultTextFormat = forTitle ? CSS.titleFormat : normalFormat;
+			result.htmlText = s;
+		}
+		else
+		{
+			result.setText(s, context);
+			result.setTextFormat(forTitle ? CSS.titleFormat : normalFormat);
+		}
 		return result;
 	}
 

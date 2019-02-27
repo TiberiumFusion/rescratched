@@ -333,5 +333,10 @@ public class Resources {
 	[Embed(source='VideoShare.svg')] private static const videoShare:Class;
 
 	[Embed(source='UI/paint/moreInfoOff.png')] private static const moreInfoOff:Class;
-	[Embed(source='UI/paint/moreInfoOn.png')] private static const moreInfoOn:Class;
+	[Embed(source = 'UI/paint/moreInfoOn.png')] private static const moreInfoOn:Class;
+	
+	// Misc icons
+	[Embed(source="UI/icon/HelpIcon_Up.png")] private static const helpIcon_Up:Class;
+	[Embed(source="UI/icon/HelpIcon_Over.png")] private static const helpIcon_Over:Class;
+	[Embed(source="UI/icon/HelpIcon_Down.png")] private static const helpIcon_Down:Class;
 }}
