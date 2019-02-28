@@ -135,6 +135,8 @@ public class Resources {
 	[Embed(source='UI/buttons/greenFlagOn.png')] private static const greenflagOn:Class;
 	[Embed(source='UI/buttons/norotationOff.png')] private static const norotationOff:Class;
 	[Embed(source='UI/buttons/norotationOn.png')] private static const norotationOn:Class;
+	[Embed(source='UI/buttons/pauseOff.png')] private static const pauseOff:Class;
+	[Embed(source='UI/buttons/pauseOn.png')] private static const pauseOn:Class;
 	[Embed(source='UI/buttons/playOff.png')] private static const playOff:Class;
 	[Embed(source='UI/buttons/playOn.png')] private static const playOn:Class;
 	[Embed(source='UI/buttons/redoOff.png')] private static const redoOff:Class;
@@ -143,6 +145,8 @@ public class Resources {
 	[Embed(source='UI/buttons/revealOn.gif')] private static const revealOn:Class;
 	[Embed(source='UI/buttons/rotate360Off.png')] private static const rotate360Off:Class;
 	[Embed(source='UI/buttons/rotate360On.png')] private static const rotate360On:Class;
+	[Embed(source='UI/buttons/resumeOff.png')] private static const resumeOff:Class;
+	[Embed(source='UI/buttons/resumeOn.png')] private static const resumeOn:Class;
 	[Embed(source='UI/buttons/spriteInfoOff.png')] private static const spriteInfoOff:Class;
 	[Embed(source='UI/buttons/spriteInfoOn.png')] private static const spriteInfoOn:Class;
 	[Embed(source='UI/buttons/stopOff.png')] private static const stopOff:Class;

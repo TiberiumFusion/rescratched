@@ -82,6 +82,7 @@ public class ScratchRuntime {
 	public var cloneCount:int;
 	public var edgeTriggersEnabled:Boolean = false; // initially false, becomes true when project first run
 	public var currentDoObj:ScratchObj = null;
+	public var projectPaused:Boolean = false;
 
 	private var microphone:Microphone;
 	private var timerBase:uint;
@@ -184,33 +185,37 @@ public class ScratchRuntime {
 				videoPosition++;
 			}
 		}
-		app.extensionManager.step();
-		if (motionDetector) motionDetector.step(); // Video motion detection
-
-		///// Step the stage, sprites, and watchers
-		app.stagePane.step(this);
-
-		///// Run scripts and commit any pen strokes
-		processEdgeTriggeredHats();
-		interp.stepThreads();
-		app.stagePane.commitPenStrokes();
 		
-		///// Update IUPS counter
-		if (IUPSCounterEnabled)
+		///// Project execution
+		if (!projectPaused)
 		{
-			var instant:Number = MillisTime.MillisNow();
-			var diff:Number = instant - iupsLast;
-			iupsBuffer.shift();
-			iupsBuffer.push(diff);
-			iupsLast = instant;
-			var bufferTime:Number = 0;
-			for (var i:int = 0; i < iupsBuffer.length; i++)
-				bufferTime += iupsBuffer[i];
-			_iups = 1000.0 / (bufferTime / iupsBuffer.length);
-		}
-		else
-			_iups = 0;
+			app.extensionManager.step();
+			if (motionDetector) motionDetector.step(); // Video motion detection
+
+			// Step the stage, sprites, and watchers
+			app.stagePane.step(this);
+
+			// Run scripts and commit any pen strokes
+			processEdgeTriggeredHats();
+			interp.stepThreads();
+			app.stagePane.commitPenStrokes();
 			
+			// Update IUPS counter
+			if (IUPSCounterEnabled)
+			{
+				var instant:Number = MillisTime.MillisNow();
+				var diff:Number = instant - iupsLast;
+				iupsBuffer.shift();
+				iupsBuffer.push(diff);
+				iupsLast = instant;
+				var bufferTime:Number = 0;
+				for (var i:int = 0; i < iupsBuffer.length; i++)
+					bufferTime += iupsBuffer[i];
+				_iups = 1000.0 / (bufferTime / iupsBuffer.length);
+			}
+			else
+				_iups = 0;
+		}	
 		
 		if (ready==ReadyLabel.COUNTDOWN || ready==ReadyLabel.READY) {
 			app.stagePane.countdown(count);

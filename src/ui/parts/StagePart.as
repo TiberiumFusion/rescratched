@@ -58,6 +58,8 @@ public class StagePart extends UIPart {
 	private var rendermodeIndicator:TextField;
 	private var runButton:IconButton;
 	private var stopButton:IconButton;
+	private var pauseButton:IconButton;
+	private var resumeButton:IconButton;
 	private var fullscreenButton:IconButton;
 	private var stageSizeButton:Sprite;
 	
@@ -92,6 +94,7 @@ public class StagePart extends UIPart {
 		addChild(outline);
 		addTitleAndInfo();
 		addRunStopButtons();
+		addPauseResumeButtons();
 		addRecordingTools();
 		addTurboIndicator();
 		addRendermodeIndicator();
@@ -214,8 +217,12 @@ public class StagePart extends UIPart {
 		runButton.y = int((topBarHeight - runButton.height) / 2);
 		stopButton.x = runButton.x + 32;
 		stopButton.y = runButton.y + 1;
+		pauseButton.x = runButton.x - pauseButton.width - 12;
+		pauseButton.y = runButton.y;
+		resumeButton.x = pauseButton.x;
+		resumeButton.y = pauseButton.y;
 
-		turboIndicator.x = w - turboIndicator.width - 73;
+		turboIndicator.x = w - turboIndicator.width - 98;
 		turboIndicator.y = app.isSmallPlayer ? 4 : 24;
 		
 		rendermodeIndicator.x = w - 45;
@@ -228,7 +235,7 @@ public class StagePart extends UIPart {
 		versionInfo.x = fullscreenButton.x + 1;
 		versionInfo.y = 27;
 
-		projectTitle.setWidth(runButton.x - projectTitle.x - 35);
+		projectTitle.setWidth(pauseButton.x - projectTitle.x - 12);
 
 		// x-y readouts
 		var left:int = w - 98; // w - 95
@@ -337,7 +344,7 @@ public class StagePart extends UIPart {
 		else {
 			g.beginGradientFill(GradientType.LINEAR, [slotColor, slotColor2], [1, 1], [0, 0],m);
 		}
-		g.drawRoundRect(0, .5, barWidth, 9,9,9);
+		g.drawRoundRect(0, 0.5, barWidth, 9, 9, 9);
 		g.endFill();
 		
 		if (lastTime!=int(time)) {
@@ -468,6 +475,17 @@ public class StagePart extends UIPart {
 			}
 		}
 		runButtonOnTicks++;
+		
+		if (app.runtime.projectPaused)
+		{
+			pauseButton.visible = false;
+			resumeButton.visible = true;
+		}
+		else
+		{
+			pauseButton.visible = true;
+			resumeButton.visible = false;
+		}
 	}
 
 	private var lastX:int, lastY:int;
@@ -506,17 +524,32 @@ public class StagePart extends UIPart {
 		if (playButton) hidePlayButton();
 	}
 
-	private function addRunStopButtons():void {
-		function startAll(b:IconButton):void { playButtonPressed(b.lastEvent) }
-		function stopAll(b:IconButton):void { app.runtime.stopAll() }
+	private function addRunStopButtons():void
+	{
+		function startAll(b:IconButton):void { playButtonPressed(b.lastEvent); }
+		function stopAll(b:IconButton):void { app.runtime.stopAll(); }
 		runButton = new IconButton(startAll, 'greenflag');
 		runButton.actOnMouseUp();
 		addChild(runButton);
 		stopButton = new IconButton(stopAll, 'stop');
 		addChild(stopButton);
 	}
+	
+	private function addPauseResumeButtons():void
+	{
+		function onPauseClick(b:IconButton):void { app.runtime.projectPaused = true; }
+		function onResumeClick(b:IconButton):void { app.runtime.projectPaused = false; }
+		pauseButton = new IconButton(onPauseClick, "pause");
+		pauseButton.isMomentary = true;
+		addChild(pauseButton);
+		resumeButton = new IconButton(onResumeClick, "resume");
+		resumeButton.isMomentary = true;
+		addChild(resumeButton);
+		resumeButton.visible = false;
+	}
 
-	private function addFullScreenButton():void {
+	private function addFullScreenButton():void
+	{
 		function toggleFullscreen(b:IconButton):void {
 			app.presentationModeWasChanged(b.isOn());
 			drawOutline();
@@ -620,16 +653,22 @@ public class StagePart extends UIPart {
 		userNameWarning.visible = false; // Don't show this by default
 	}
 
-	public function playButtonPressed(evt:MouseEvent):void {
-		if(app.loadInProgress) {
+	public function playButtonPressed(evt:MouseEvent):void
+	{
+		if (app.loadInProgress)
+		{
 			stopEvent(evt);
 			return;
 		}
 
+		// Ensure interpreter is unpaused
+		app.runtime.projectPaused = false;
+		
 		// Mute the project if it was started with the control key down
 		SoundMixer.soundTransform = new SoundTransform((evt && evt.ctrlKey ? 0 : 1));
 
-		if (evt && evt.shiftKey) {
+		if (evt && evt.shiftKey)
+		{
 			app.toggleTurboMode();
 			return;
 		}
