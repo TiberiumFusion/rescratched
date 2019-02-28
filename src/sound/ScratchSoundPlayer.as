@@ -39,11 +39,23 @@ public class ScratchSoundPlayer {
 
 	static public var activeSounds:Array = [];
 
-	static public function stopAllSounds():void {
+	static public function StopAllSounds():void
+	{
 		// Stop playing all currently playing sounds
 		var oldSounds:Array = activeSounds;
 		activeSounds = [];
 		for each (var player:ScratchSoundPlayer in oldSounds) player.stopPlaying();
+	}
+	
+	static public function PauseAllSounds():void
+	{
+		for each (var player:ScratchSoundPlayer in activeSounds)
+			player.pausePlayback();
+	}
+	static public function ResumeAllSounds():void
+	{
+		for each (var player:ScratchSoundPlayer in activeSounds)
+			player.resumePlayback();
 	}
 
 	// sound being played
@@ -60,8 +72,10 @@ public class ScratchSoundPlayer {
 	protected var stepSize:Number;
 	private var adpcmBlockSize:int;
 	protected var bytePosition:int;  // use our own position to allow sound data to be shared
+	private var flashSound:Sound;
 	public var soundChannel:SoundChannel;
 	private var lastBufferTime:uint;
+	private var pausePosition:Number = -1;
 
 	// volume support
 	public var client:*;
@@ -116,18 +130,20 @@ public class ScratchSoundPlayer {
 		dataBytes = null;
 	}
 
-	public function startPlaying(doneFunction:Function = null):void {
-		readPosition=0;
+	public function startPlaying(doneFunction:Function = null):void
+	{
+		readPosition = 0;
 		dataBytes = new ByteArray();
-		dataBytes.position=0;
+		dataBytes.position = 0;
 		stopIfAlreadyPlaying();
 		activeSounds.push(this);
 		bytePosition = startOffset;
 		nextSample = getSample();
-
-		var flashSnd:Sound = new Sound();
-		flashSnd.addEventListener(SampleDataEvent.SAMPLE_DATA, writeSampleData);
-		soundChannel = flashSnd.play();
+		
+		flashSound = null;
+		flashSound = new Sound();
+		flashSound.addEventListener(SampleDataEvent.SAMPLE_DATA, writeSampleData);
+		soundChannel = flashSound.play();
 		if (soundChannel) {
 			if (doneFunction != null) soundChannel.addEventListener(Event.SOUND_COMPLETE, doneFunction);
 		} else {
@@ -135,6 +151,21 @@ public class ScratchSoundPlayer {
 			stopPlaying();
 			if (doneFunction != null) doneFunction();
 		}
+	}
+	
+	public function pausePlayback():void
+	{
+		if (scratchSound != null && flashSound != null && soundChannel != null)
+		{
+			pausePosition = soundChannel.position;
+			soundChannel.stop();
+		}
+	}
+	
+	public function resumePlayback():void
+	{
+		if (scratchSound != null && flashSound != null && soundChannel != null && pausePosition >= 0)
+			soundChannel = flashSound.play(pausePosition);
 	}
 
 	protected function stopIfAlreadyPlaying():void {

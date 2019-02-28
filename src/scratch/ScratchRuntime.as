@@ -221,6 +221,20 @@ public class ScratchRuntime {
 			app.stagePane.countdown(count);
 		}
 	}
+	
+	public function PauseProject(pauseSounds:Boolean = true):void
+	{
+		projectPaused = true;
+		if (pauseSounds)
+			ScratchSoundPlayer.PauseAllSounds();
+	}
+	
+	public function ResumeProject(resumeSounds:Boolean = true):void
+	{
+		projectPaused = false;
+		if (resumeSounds)
+			ScratchSoundPlayer.ResumeAllSounds();
+	}
 
 //-------- recording video code ---------
 	public var recording:Boolean;
@@ -561,7 +575,7 @@ public class ScratchRuntime {
 		app.stagePane.deleteClones();
 		cloneCount = 0;
 		clearKeyDownArray();
-		ScratchSoundPlayer.stopAllSounds();
+		ScratchSoundPlayer.StopAllSounds();
 		app.extensionManager.stopButtonPressed();
 		app.stagePane.clearFilters();
 		for each (var s:ScratchSprite in app.stagePane.sprites()) {

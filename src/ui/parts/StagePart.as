@@ -537,8 +537,8 @@ public class StagePart extends UIPart {
 	
 	private function addPauseResumeButtons():void
 	{
-		function onPauseClick(b:IconButton):void { app.runtime.projectPaused = true; }
-		function onResumeClick(b:IconButton):void { app.runtime.projectPaused = false; }
+		function onPauseClick(b:IconButton):void{ app.runtime.PauseProject(); }
+		function onResumeClick(b:IconButton):void { app.runtime.ResumeProject(); }
 		pauseButton = new IconButton(onPauseClick, "pause");
 		pauseButton.isMomentary = true;
 		addChild(pauseButton);

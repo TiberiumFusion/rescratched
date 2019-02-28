@@ -42,7 +42,7 @@ public class SoundPrims {
 	public function addPrimsTo(primTable:Dictionary):void {
 		primTable["playSound:"]			= primPlaySound;
 		primTable["doPlaySoundAndWait"]	= primPlaySoundUntilDone;
-		primTable["stopAllSounds"]		= function(b:*):* { ScratchSoundPlayer.stopAllSounds() };
+		primTable["stopAllSounds"]		= function(b:*):* { ScratchSoundPlayer.StopAllSounds() };
 
 		primTable["drum:duration:elapsed:from:"]	= primPlayDrum; // Scratch 1.4 drum numbers
 		primTable["playDrum"]						= primPlayDrum;
