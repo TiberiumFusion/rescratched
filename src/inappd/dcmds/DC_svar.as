@@ -23,6 +23,12 @@ package inappd.dcmds
 		
 		override public function Execute(dconsole:DebugConsole = null):void
 		{
+			if (!Scratch.app.jsEnabled)
+			{
+				dconsole.HistoryAppendMessage(DebugMessages.Tag_ServerClient, DebugMessages.Msg_SvarNoJS);
+				return;
+			}
+			
 			if (subArgs.length == 0)
 				dieNotEnoughAtLeastArgs(dconsole, 1, 0);
 			else if (subArgs.length > 2)

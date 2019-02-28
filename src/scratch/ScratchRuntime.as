@@ -832,41 +832,32 @@ public class ScratchRuntime {
 		installEmptyProject();
 	}
 
-	public function selectProjectFile():void {
-		// Prompt user for a file name and load that file.
+	public function loadLocalFile():void
+	{
+		// Prompt the user for a file and load it
 		var fileName:String, data:ByteArray;
-		function fileLoadHandler(event:Event):void {
+		function fileLoadHandler(event:Event):void
+		{
 			var file:FileReference = FileReference(event.target);
 			fileName = file.name;
 			data = file.data;
 			if (app.stagePane.isEmpty()) doInstall();
 			else DialogBox.confirm('Replace contents of the current project?', app.stage, doInstall);
 		}
-		function doInstall(ignore:* = null):void {
-			installProjectFromFile(fileName, data);
+		function doInstall(ignore:* = null):void
+		{
+			installProjectFromBytes(data, fileName);
 		}
 		stopAll();
 
 		var filter:FileFilter;
-		if (Scratch.app.isExtensionDevMode) {
+		if (Scratch.app.isExtensionDevMode)
 			filter = new FileFilter('ScratchX Project', '*.sbx;*.sb;*.sb2');
-		}
-		else {
+		else
 			filter = new FileFilter('Scratch Project', '*.sb;*.sb2');
-		}
 		Scratch.loadSingleFile(fileLoadHandler, filter);
 	}
 
-	public function installProjectFromFile(fileName:String, data:ByteArray):void
-	{
-		// Install a project from a file with the given name and contents.
-		stopAll();
-		app.oldWebsiteURL = '';
-		app.loadInProgress = true;
-		installProjectFromData(data);
-		app.setProjectName(fileName);
-	}
-	
 	// Installs a project from a byte array
 	public function installProjectFromBytes(projectBytes:ByteArray, projectName:String = ""):void
 	{

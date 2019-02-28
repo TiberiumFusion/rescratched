@@ -294,12 +294,15 @@ public class Scratch extends Sprite
 	
 	//////////////////////////////////////////// Remote SBX Load (ScratchX github) ////////////////////////////////////////////
 	
-	private function loadSingleGithubURL(url:String):void {
+	private function loadSingleGithubURL(url:String):void
+	{
 		url = StringUtil.trim(unescape(url));
 
-		function handleComplete(e:Event):void {
-			runtime.installProjectFromData(sbxLoader.data);
-			if (StringUtil.trim(projectName()).length == 0) {
+		function handleComplete(e:Event):void
+		{
+			runtime.installProjectFromData(remoteLoader.data);
+			if (StringUtil.trim(projectName()).length == 0)
+			{
 				var newProjectName:String = url;
 				var index:int = newProjectName.indexOf('?');
 				if (index > 0) newProjectName = newProjectName.slice(0, index);
@@ -311,12 +314,16 @@ public class Scratch extends Sprite
 			}
 		}
 
-		function handleError(e:ErrorEvent):void {
-			jsThrowError('Failed to load SBX: ' + e.toString());
+		function handleError(e:ErrorEvent):void
+		{
+			jsThrowError("Failed to load project from remote source. " + e.toString());
+			if (canLogToDebug())
+				debugConsole.HistoryAppendMessage(DebugMessages.Tag_ScratchApp, DebugMessages.Msg_RemoteLoadFailed(url));
 		}
 
 		var fileExtension:String = url.substr(url.lastIndexOf('.')).toLowerCase();
-		if (fileExtension == '.js') {
+		if (fileExtension == '.js')
+		{
 			externalCall('ScratchExtensions.loadExternalJS', null, url);
 			return;
 		}
@@ -324,28 +331,31 @@ public class Scratch extends Sprite
 		// Otherwise assume it's a project (SB2, SBX, etc.)
 		loadInProgress = true;
 		var request:URLRequest = new URLRequest(url);
-		var sbxLoader:URLLoader = new URLLoader(request);
-		sbxLoader.dataFormat = URLLoaderDataFormat.BINARY;
-		sbxLoader.addEventListener(Event.COMPLETE, handleComplete);
-		sbxLoader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, handleError);
-		sbxLoader.addEventListener(IOErrorEvent.IO_ERROR, handleError);
-		sbxLoader.load(request);
+		var remoteLoader:URLLoader = new URLLoader(request);
+		remoteLoader.dataFormat = URLLoaderDataFormat.BINARY;
+		remoteLoader.addEventListener(Event.COMPLETE, handleComplete);
+		remoteLoader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, handleError);
+		remoteLoader.addEventListener(IOErrorEvent.IO_ERROR, handleError);
+		remoteLoader.load(request);
 	}
 
 	private var pendingExtensionURLs:Array;
-	private function loadGithubURL(urlOrArray:*):void {
+	private function loadGithubURL(urlOrArray:*):void
+	{
 		if (!isExtensionDevMode) return;
 
 		var url:String;
 		var urlArray:Array = urlOrArray as Array;
-		if (urlArray) {
+		if (urlArray)
+		{
 			var urlCount:int = urlArray.length;
 			var extensionURLs:Array = [];
 			var projectURL:String;
 			var index:int;
 
 			// Filter URLs: allow at most one project file, and wait until it loads before loading extensions.
-			for (index = 0; index < urlCount; ++index) {
+			for (index = 0; index < urlCount; ++index)
+			{
 				url = StringUtil.trim(unescape(urlArray[index]));
 				if (StringUtil.endsWith(url.toLowerCase(), '.js')) {
 					extensionURLs.push(url);
@@ -1200,7 +1210,7 @@ public class Scratch extends Sprite
 	//------------------------------
 	public function showFileMenu(b:*):void {
 		var m:Menu = new Menu(null, 'File', CSS.topBarColor(), 28);
-		m.addItem('New', createNewProject);
+		m.addItem("New Project", createNewProject);
 		m.addLine();
 
 		// Derived class will handle this
@@ -1215,36 +1225,38 @@ public class Scratch extends Sprite
 
 	protected function addFileMenuItems(b:*, m:Menu):void
 	{
-		m.addItem('Load Project', runtime.selectProjectFile);
-		m.addItem('Save Project', exportProjectToFile);
+		m.addItem("Load Project From Local File...", runtime.loadLocalFile);
+		m.addItem("Load Project From Remote File...", runtime.loadLocalFile);
+		m.addItem("Load Project From scratch.mit.edu...", runtime.loadLocalFile);
+		m.addItem("Save Project As...", exportProjectToFile);
 		
 		m.addLine();
-		m.addItem('Project Preferences', editProjectPreferences);
+		m.addItem("Project Preferences...", editProjectPreferences);
 		
 		m.addLine();
 		if (runtime.recording || runtime.ready==ReadyLabel.COUNTDOWN || runtime.ready==ReadyLabel.READY) {
-			m.addItem('Stop Video', runtime.stopVideo);
+			m.addItem("Stop Video", runtime.stopVideo);
 		} else {
-			m.addItem('Record Project Video', runtime.exportToVideo);
+			m.addItem("Record Project Video...", runtime.exportToVideo);
 		}
 		
 		if (canUndoRevert()) {
 			m.addLine();
-			m.addItem('Undo Revert', undoRevert);
+			m.addItem("Undo Revert", undoRevert);
 		} else if (canRevert()) {
 			m.addLine();
-			m.addItem('Revert', revertToOriginalProject);
+			m.addItem("Revert", revertToOriginalProject);
 		}
 
 		if (b.lastEvent.shiftKey) {
 			m.addLine();
-			m.addItem('Save Project Summary', saveSummary);
-			m.addItem('Show version details', showVersionDetails);
+			m.addItem("Export Project Summary...", saveSummary);
+			m.addItem("Show version details", showVersionDetails);
 		}
 		
 		if (b.lastEvent.shiftKey && jsEnabled) {
 			m.addLine();
-			m.addItem('Import experimental extension', function ():void {
+			m.addItem("Import experimental extension...", function ():void {
 				function loadJSExtension(dialog:DialogBox):void {
 					var url:String = dialog.getField('URL').replace(/^\s+|\s+$/g, '');
 					if (url.length == 0) return;
@@ -1260,41 +1272,45 @@ public class Scratch extends Sprite
 		}
 	}
 
-	public function showEditMenu(b:*):void {
-		var m:Menu = new Menu(null, 'More', CSS.topBarColor(), 28);
-		m.addItem('Undelete', runtime.undelete, runtime.canUndelete());
+	public function showEditMenu(b:*):void
+	{
+		var m:Menu = new Menu(null, "More", CSS.topBarColor(), 28);
+		m.addItem("Undelete", runtime.undelete, runtime.canUndelete());
 		m.addLine();
-		m.addItem('Small stage layout', toggleSmallStage, true, stageIsContracted);
-		m.addItem('Turbo mode', toggleTurboMode, true, interp.turboMode);
+		m.addItem("Small stage layout", toggleSmallStage, true, stageIsContracted);
+		m.addItem("Turbo mode", toggleTurboMode, true, interp.turboMode);
 		addEditMenuItems(b, m);
 		var p:Point = b.localToGlobal(new Point(0, 0));
 		m.showOnStage(stage, b.x, topBarPart.bottom() - 1);
 	}
 
-	protected function addEditMenuItems(b:*, m:Menu):void {
+	protected function addEditMenuItems(b:*, m:Menu):void
+	{
 		m.addLine();
-		m.addItem('Edit block colors', editBlockColors);
+		m.addItem("Edit block colors...", editBlockColors);
 	}
 
-	protected function editBlockColors():void {
+	protected function editBlockColors():void
+	{
 		var d:DialogBox = new DialogBox();
-		d.addTitle('Edit Block Colors');
+		d.addTitle("Edit Block Colors");
 		d.addWidget(new BlockColorEditor());
-		d.addButton('Close', d.cancel);
+		d.addButton("Close", d.cancel);
 		d.showOnStage(stage, true);
 	}
 
 	public function showAdvancedMenu(b:*):void
 	{
-		var m:Menu = new Menu(null, 'Advanced', CSS.topBarColor(), 28);
+		var m:Menu = new Menu(null, "Advanced", CSS.topBarColor(), 28);
 		if (showDebugConsole)
-			m.addItem('Hide Debug Console', toggleDebugConsole);
+			m.addItem("Hide Debug Console", toggleDebugConsole);
 		else
-			m.addItem('Show Debug Console', toggleDebugConsole);
+			m.addItem("Show Debug Console", toggleDebugConsole);
 		m.showOnStage(stage, b.x, topBarPart.bottom() - 1);
 	}
 
-	protected function canExportInternals():Boolean {
+	protected function canExportInternals():Boolean
+	{
 		return false;
 	}
 

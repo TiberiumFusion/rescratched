@@ -19,7 +19,8 @@ package inappd
 		public static const Tag_ScratchStage:FormattedString = new FormattedString("[SSTG]", new TextFormat("InconsolataBold", 12, 0x257317));
 		public static const Tag_ServerClient:FormattedString = new FormattedString("[SVCL]", new TextFormat("InconsolataBold", 12, 0x1E9FBB));
 		public static const Tag_RescratchedLoader:FormattedString = new FormattedString("[RSLD]", new TextFormat("InconsolataBold", 12, 0x2062AA));
-		public static const Tag_ScratchRuntime:FormattedString = new FormattedString("[SRUN]", new TextFormat("InconsolataBold", 12, 0xB76A1E));
+		public static const Tag_ScratchRuntime:FormattedString = new FormattedString("[SRUN]", new TextFormat("InconsolataBold", 12, 0x679300));
+		public static const Tag_ScratchApp:FormattedString = new FormattedString("[SAPP]", new TextFormat("InconsolataBold", 12, 0xB76A1E));
 		
 		
 		//////////////////////////////////////////// Debug Messages ////////////////////////////////////////////
@@ -51,6 +52,7 @@ package inappd
 		public static const Msg_RuntimeInstallingEmptyProject:FormattedStringList = new FormattedStringList(new FormattedString("Installing empty project...", CSS.consoleTextRegularFormat));
 		public static const Msg_RuntimeInstallingProject:FormattedStringList = new FormattedStringList(new FormattedString("Installing project...", CSS.consoleTextRegularFormat));
 		public static const Msg_RuntimeInstalledProject:FormattedStringList = new FormattedStringList(new FormattedString("Projection installation complete", CSS.consoleTextRegularFormat));
+		public static const Msg_SvarNoJS:FormattedStringList = new FormattedStringList(new FormattedString("JS interface not present. This command is disabled.", CSS.consoleTextRegularFormat));
 		
 		///// General message generators
 		// DebugCommand input
@@ -146,6 +148,13 @@ package inappd
 		{
 			var message:FormattedStringList = new FormattedStringList();
 			message.AddText(new FormattedString("Received mismatched number project assets. Got " + actual + ", expected " + expected, CSS.consoleTextRegularFormat));
+			return message;
+		}
+		// Project loading
+		public static function Msg_RemoteLoadFailed(source:String):FormattedStringList
+		{
+			var message:FormattedStringList = new FormattedStringList();
+			message.AddText(new FormattedString("Failed to load project from remote source: " + source, CSS.consoleTextRegularFormat));
 			return message;
 		}
 	}
