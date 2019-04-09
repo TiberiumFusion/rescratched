@@ -4,6 +4,53 @@
 
 Rescratched maintains the same license policy that the [Scratch 2.0 open source project](https://github.com/LLK/scratch-flash) uses. Thus, the Rescratched code is provider under the GPLv2 license, and forks can be released under GPLv2 or any later version of the GPL.
 
+## Status
+
+Rescratched is nearly through with primary develpoment. The official Rescratched site will be initially hosted on my own website. If reception is sufficient, I will purchase the resources to host Rescratched at a dedicated domain.
+
+## Notable Features
+
+* Compatible with Scratch 1.X and Scratch 2.0 projects (SB and SB2 format)
+* Capable of "recovering" Scratch 1.X and Scratch 2.0 projects from the official Scratch website (you *dont* have to use horrible Scratch 3.0 to keep working on your projects!)
+* Introduces and supports per-project runtime settings
+* Incremental stream of UX improvements and advanced capabilities, including...
+* The feature most highly requested, but always denied by the Scratch Team: project play/pause!
+
+## Origin and Goals
+
+Rescratched was born from the tear that the Scratch 3.0's "love it or leave it" philosophy put in the Scratch community. The failures and regressions of Scratch 3.0 are both nasty and plentiful, with the Scratch Team's refusal to resolve any as the icing on top. Naturally, when a new version of a product is hot garbage, displaced users will return to a previous, mature version; but, in this case, the in-browser Scratch 2.0 editor is kaput, leaving the AIR-based offline editor as the only official distribution of Scratch 2.0 remaining. Adobe AIR applications require installation like any regular software, which is a barrier to users without administrative powers, users waiting on slow-moving IT departments, users who are suspicious of installing things, etc. So, while some existing users have already cleared this hurdle, many new and long-time Scratchers alike have a substantial obstacle in the way of trying out or carrying on with Scratch 2.0.
+
+Enter Rescratched, a continuation of the Scratch 2.0 editor and player that runs in the browser, just as Scratch 2.0 did before. The reliable Scratch 2.0 experience, now provided by Rescratched, is for...
+* Veteran Scratchers
+* New Scratchers
+* Scratchers looking for some advanced new features
+* Anyone with unfinished Scratch 2.0 projects
+* Anyone with ideas for new Scratch 2.0 projects
+* Anyone with projects that are broken by Scratch 3.0
+* Anyone who suffers eye strain from Scratch 3.0's unbelievably low-contrast UI
+* Anyone who suffers boredom from Scratch 3.0's loading times and constant freezing
+* Anyone who is fed up with the limitations of Scratch 3.0
+* Anyone who wants to see what Scratch was all about
+* You? Yes, you!
+
+## Potential Concerns & Quanderies
+
+#### Rescratched/Scratch 2.0 uses Adobe Flash, and Flash is dead/insecure/slow/so 2010/gross!
+Flash has fallen from its mighty throne, yes, but it is not as dead or insecure as sensational media would have you believe. Adobe continues to regularly update Flash with security patches. Additionally, while Flash's history of use in games/videos/animations/everything has led to unfair comparisons against deticated versions of those applications, thus forming the consensus that "Flash is sloooooow", please note that the Scratch 2.0 editor (as well as Rescratched) has distinctly better performance than Scratch 3.0 in most cases.
+
+#### Can Rescratched rescue/edit my Scratch 3.0 projects?
+Unfortunately, no. The Scratch 3.0 project format, SB3, is substantially different from the Scratch 2.0 SB2 format. Presently, there is no utility to convert a Scratch 3.0 project to the SB2 format, but I have that on the backburner for my free time.
+
+#### What are the "advanced new features" in Rescratched?
+The typical person who decides to try out Rescratched is likely a veteran Scratcher who has already pushed against some of Scratch 2.0's limitations. In gradual time, I hope to introduce more advanced project-making capabilities to Rescratched to help keep the interest and attention of these users. Such new capabilities will *never* break compatibility with vanilla Scratch 2.0 projects.
+
+--------------------------------------------------------------
+--------------------------------------------------------------
+--------------------------------------------------------------
+
+# Relevant README from origin scratch-flash is below
+### I will get around to rewriting the build instructions once Rescratched is launched.
+
 ## Building
 
 The Scratch 2.0 build process now uses [Gradle](http://gradle.org/) to simplify the process of acquiring dependencies:
